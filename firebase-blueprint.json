@@ -1,0 +1,174 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Information about a registered user (student or admin).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "createdAt"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Details of an educational course.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "thumbnail": { "type": "string", "format": "uri" },
+        "instructor": { "type": "string" },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "videoUrl": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "price", "createdAt"]
+    },
+    "Book": {
+      "title": "Book",
+      "description": "Details of a book.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "coverImage": { "type": "string", "format": "uri" },
+        "author": { "type": "string" },
+        "bookType": { "type": "string", "enum": ["hardcover", "pdf"] },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "price", "bookType", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Information about a purchase attempt.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "itemType": { "type": "string", "enum": ["course", "book"] },
+        "itemId": { "type": "string" },
+        "itemTitle": { "type": "string" },
+        "amount": { "type": "number" },
+        "trxId": { "type": "string" },
+        "paymentScreenshot": { "type": "string", "format": "uri" },
+        "paymentMethod": { "type": "string", "enum": ["manual", "stripe"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "shippingAddress": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "itemType", "itemId", "amount", "status", "createdAt"]
+    },
+    "Progress": {
+      "title": "Progress",
+      "description": "Student progress in a course.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "completedLessons": { "type": "array", "items": { "type": "string" } },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "courseId", "completedLessons", "updatedAt"]
+    },
+    "Quiz": {
+      "title": "Quiz",
+      "description": "Assessment for a course.",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "question": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "correctAnswer": { "type": "number" }
+            }
+          }
+        },
+        "passingScore": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["courseId", "questions", "passingScore", "createdAt"]
+    },
+    "Certificate": {
+      "title": "Certificate",
+      "description": "Proof of completion.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "userName": { "type": "string" },
+        "courseTitle": { "type": "string" },
+        "issuedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "courseId", "userName", "courseTitle", "issuedAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "warning"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles."
+    },
+    "courses/{courseId}": {
+      "schema": "Course",
+      "description": "Course content."
+    },
+    "books/{bookId}": {
+      "schema": "Book",
+      "description": "Digital books."
+    },
+    "orders/{orderId}": {
+      "schema": "Order",
+      "description": "Purchase records."
+    },
+    "progress/{progressId}": {
+      "schema": "Progress",
+      "description": "User progress tracking."
+    },
+    "quizzes/{quizId}": {
+      "schema": "Quiz",
+      "description": "Course assessments."
+    },
+    "certificates/{certId}": {
+      "schema": "Certificate",
+      "description": "User achievements."
+    },
+    "notifications/{notifId}": {
+      "schema": "Notification",
+      "description": "User notifications."
+    }
+  }
+}

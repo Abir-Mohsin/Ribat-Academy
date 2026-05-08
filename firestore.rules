@@ -1,0 +1,171 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'abirmohsin02@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Entity Validations ---
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'role', 'createdAt']) &&
+             data.keys().size() == 5 &&
+             data.uid == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email == request.auth.token.email &&
+             data.role in ['student', 'admin'] &&
+             data.createdAt == request.time;
+    }
+
+    function isValidCourse(data) {
+      return data.keys().hasAll(['title', 'description', 'price', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.description is string && data.description.size() > 0 &&
+             data.price is number && data.price >= 0 &&
+             (!('lessons' in data) || data.lessons is list) &&
+             (!('instructor' in data) || data.instructor is map) &&
+             data.createdAt == request.time;
+    }
+
+    function isValidBook(data) {
+      return data.keys().hasAll(['title', 'description', 'price', 'bookType', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.description is string && data.description.size() > 0 &&
+             data.price is number && data.price >= 0 &&
+             data.bookType in ['hardcover', 'pdf'] &&
+             (!('fileUrl' in data) || data.fileUrl is string) &&
+             data.createdAt == request.time;
+    }
+
+    function isValidOrder(data) {
+      return data.userId == request.auth.uid &&
+             data.status == 'pending' &&
+             data.createdAt == request.time;
+    }
+
+    function isValidProgress(data) {
+      return data.keys().hasAll(['userId', 'courseId', 'completedLessons', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.courseId is string &&
+             data.completedLessons is list &&
+             data.updatedAt == request.time;
+    }
+
+    // --- Collections ---
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isValidUser(incoming());
+      allow update: if isSignedIn() && (
+        (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'profileImage'])) ||
+        isAdmin()
+      );
+    }
+
+    match /courses/{courseId} {
+      allow get, list: if true; // Publicly viewable
+      allow write: if isAdmin();
+    }
+
+    match /books/{bookId} {
+      allow get, list: if true; // Publicly viewable
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidOrder(incoming());
+      allow update: if isAdmin(); // Only admin can approve/reject
+    }
+
+    match /progress/{progressId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidProgress(incoming());
+      allow update: if isSignedIn() && isOwner(existing().userId) && isValidProgress(incoming());
+    }
+
+    match /quizzes/{quizId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /certificates/{certId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn(); // User can create their own if they pass a quiz (logic enforced by app/functions in production, here we trust the client for demo)
+      allow write: if isAdmin();
+    }
+
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true; // Public reviews
+      allow write: if isAdmin();
+    }
+
+    match /videoReviews/{reviewId} {
+      allow read: if true; // Public video reviews
+      allow write: if isAdmin();
+    }
+
+    match /instructors/{instructorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /live_classes/{classId} {
+      allow get, list: if true;
+      allow write: if isAdmin();
+    }
+
+    match /stats/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
