@@ -26,7 +26,6 @@ import { cn } from '@/src/lib/utils';
 import { Button } from '@/src/components/Button';
 import { collection, getDocs, updateDoc, doc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
-import { VideoGenerator } from '@/src/components/admin/VideoGenerator';
 import { CourseManager } from '@/src/components/admin/CourseManager';
 import { BookManager } from '@/src/components/admin/BookManager';
 import { OrdersManager } from '@/src/components/admin/OrdersManager';
@@ -152,7 +151,6 @@ export function AdminPanel() {
     { id: 'video-reviews', name: 'Video Reviews', icon: Video },
     { id: 'about', name: 'Manage About', icon: Info },
     { id: 'users', name: 'User Management', icon: Users },
-    { id: 'video-gen', name: 'Promo Video', icon: Video },
   ];
 
   return (
@@ -308,9 +306,6 @@ export function AdminPanel() {
               </div>
             )}
           </div>
-        )}
-        {activeTab === 'video-gen' && (
-          <VideoGenerator />
         )}
         {activeTab === 'payments' && (
           <OrdersManager />
