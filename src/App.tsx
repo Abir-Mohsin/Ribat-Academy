@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { onSnapshot, doc } from 'firebase/firestore';
+import { db } from './lib/firebase';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -29,6 +31,26 @@ function ProtectedRoute({ children, adminOnly = false }: { children: React.React
 }
 
 function AppContent() {
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'general'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const root = document.documentElement;
+        if(data.themePrimaryDark) root.style.setProperty('--theme-primary-dark', data.themePrimaryDark);
+        if(data.themePrimaryLight) root.style.setProperty('--theme-primary-light', data.themePrimaryLight);
+        if(data.themeButtonBg) root.style.setProperty('--theme-button-bg', data.themeButtonBg);
+        if(data.themeButtonHover) root.style.setProperty('--theme-button-hover', data.themeButtonHover);
+        if(data.themeCardBg) root.style.setProperty('--theme-card-bg', data.themeCardBg);
+        if(data.themeCardBorder) root.style.setProperty('--theme-card-border', data.themeCardBorder);
+        if(data.themeTextHeading) root.style.setProperty('--theme-text-heading', data.themeTextHeading);
+        if(data.themeTextBody) root.style.setProperty('--theme-text-body', data.themeTextBody);
+        if(data.themeFooterBg) root.style.setProperty('--theme-footer-bg', data.themeFooterBg);
+        if(data.themeFooterText) root.style.setProperty('--theme-footer-text', data.themeFooterText);
+      }
+    });
+    return unsub;
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />

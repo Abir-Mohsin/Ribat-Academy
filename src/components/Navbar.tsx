@@ -22,14 +22,14 @@ export function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-[var(--color-primary-dark)] text-[#ffffff] border-b border-[var(--color-primary-light)]">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-            <GraduationCap className="text-white w-6 h-6" />
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+            <GraduationCap className="text-[var(--color-primary-dark)] w-6 h-6" />
           </div>
-          <span className="font-bold text-xl tracking-tight">Ribat Academy</span>
+          <span className="font-bold text-xl tracking-tight text-white">Ribat Academy</span>
         </Link>
 
         {/* Desktop Menu */}
@@ -39,8 +39,8 @@ export function Navbar() {
               key={link.name}
               to={link.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-black",
-                isActive(link.href) ? "text-black" : "text-gray-500"
+                "text-sm font-medium transition-colors hover:text-gray-300",
+                isActive(link.href) ? "text-white" : "text-gray-300"
               )}
             >
               {link.name}
@@ -71,7 +71,7 @@ export function Navbar() {
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-gray-500"
+          className="md:hidden p-2 text-white"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -85,7 +85,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
+            className="md:hidden bg-[var(--color-primary-dark)] border-b border-[var(--color-primary-light)] overflow-hidden"
           >
             <div className="px-4 py-6 space-y-4">
               {navLinks.map((link) => (
@@ -95,7 +95,7 @@ export function Navbar() {
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     "block text-lg font-medium",
-                    isActive(link.href) ? "text-black" : "text-gray-500"
+                    isActive(link.href) ? "text-white" : "text-gray-300"
                   )}
                 >
                   {link.name}
@@ -107,7 +107,7 @@ export function Navbar() {
                     <Link
                       to="/dashboard"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 text-lg font-medium text-black"
+                      className="flex items-center gap-3 text-lg font-medium text-white"
                     >
                       <User size={20} />
                       Dashboard

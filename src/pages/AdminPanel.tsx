@@ -149,7 +149,7 @@ export function AdminPanel() {
     { id: 'payments', name: 'Approve Payments', icon: CreditCard },
     { id: 'testimonials', name: 'Text Reviews', icon: MessageSquare },
     { id: 'video-reviews', name: 'Video Reviews', icon: Video },
-    { id: 'about', name: 'Manage About', icon: Info },
+    { id: 'about', name: 'Site Editor', icon: Info },
     { id: 'users', name: 'User Management', icon: Users },
   ];
 

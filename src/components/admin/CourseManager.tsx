@@ -93,7 +93,7 @@ export function CourseManager() {
         await addDoc(collection(db, 'courses'), {
           ...data,
           createdAt: serverTimestamp(),
-          status: 'draft',
+          status: 'published',
           lessons: editingCourse.lessons || [],
           objectives: editingCourse.objectives || [],
         });
@@ -321,7 +321,7 @@ export function CourseManager() {
              instructor: { name: '', role: '', bio: '' },
              lessons: [],
              objectives: [],
-             status: 'draft'
+             status: 'published'
            });
            setIsEditing(true);
          }}>

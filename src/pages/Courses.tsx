@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { db } from '@/src/lib/firebase';
+import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { Card } from '@/src/components/Card';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -23,15 +23,22 @@ export function Courses() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const qCourses = query(collection(db, 'courses'), where('status', '==', 'published'), orderBy('createdAt', 'desc'));
-        const coursesSnap = await getDocs(qCourses);
-        setCourses(coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        // Fetch Courses
+        const coursesSnap = await getDocs(collection(db, 'courses'));
+        const activeCourses = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })).filter(c => c.status !== 'draft');
+        // Safely sort by createdAt using toMillis() if available
+        setCourses(activeCourses.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() || 0;
+          const bTime = b.createdAt?.toMillis?.() || 0;
+          return bTime - aTime;
+        }));
 
-        const qLive = query(collection(db, 'live_classes'), where('status', '==', 'published'), orderBy('startTime', 'asc'));
-        const liveSnap = await getDocs(qLive);
-        setLiveClasses(liveSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'live_class' })));
+        const liveSnap = await getDocs(collection(db, 'live_classes'));
+        const activeLive = liveSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any, type: 'live_class' })).filter(c => c.status !== 'draft');
+        setLiveClasses(activeLive.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()));
       } catch (error) {
         console.error("Error fetching data:", error);
+        handleFirestoreError(error as Error, OperationType.GET, 'courses');
       } finally {
         setLoading(false);
       }

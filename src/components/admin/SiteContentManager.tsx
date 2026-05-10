@@ -32,8 +32,28 @@ interface SiteSettings {
   heroBadge: string;
   heroTitle: string;
   heroDescription: string;
-  heroImage: string;
+  heroImages: string; // Store as comma-separated string
   heroVideoId: string;
+  heroRatingText: string;
+  heroRatingImages: string;
+  themePrimaryDark: string;
+  themePrimaryLight: string;
+  themeButtonBg: string;
+  themeButtonHover: string;
+  themeCardBg: string;
+  themeCardBorder: string;
+  themeTextHeading: string;
+  themeTextBody: string;
+  themeFooterBg: string;
+  themeFooterText: string;
+  heroBackgroundImage: string;
+  heroVideoUrl: string;
+  aboutValue1Title: string;
+  aboutValue1Desc: string;
+  aboutValue3Title: string;
+  aboutValue3Desc: string;
+  aboutValue4Title: string;
+  aboutValue4Desc: string;
 }
 
 export function SiteContentManager() {
@@ -46,8 +66,28 @@ export function SiteContentManager() {
     heroBadge: 'Empowering the Next Generation',
     heroTitle: 'Islamic + Modern Education Platform',
     heroDescription: 'Bridging the gap between timeless Islamic values and contemporary skills. Join over 5,000+ students worldwide mastering Arabic, Deen, and Digital Technology.',
-    heroImage: '',
-    heroVideoId: ''
+    heroImages: '',
+    heroVideoId: '',
+    heroRatingText: '4.9/5 rated by 2,000+ happy students',
+    heroRatingImages: '',
+    themePrimaryDark: '#002D34',
+    themePrimaryLight: '#0B4F4F',
+    themeButtonBg: '#0B4F4F',
+    themeButtonHover: '#146868',
+    themeCardBg: '#ffffff',
+    themeCardBorder: '#E5E7EB',
+    themeTextHeading: '#ffffff',
+    themeTextBody: 'rgba(255, 255, 255, 0.7)',
+    themeFooterBg: '#002D34',
+    themeFooterText: '#ffffff',
+    heroBackgroundImage: '',
+    heroVideoUrl: '',
+    aboutValue1Title: 'Academic Excellence',
+    aboutValue1Desc: 'Rigorous curriculum combining tradition with modern pedagogical methods.',
+    aboutValue3Title: 'Community First',
+    aboutValue3Desc: 'Fostering a supportive environment for students from all walks of life.',
+    aboutValue4Title: 'Expert Guidance',
+    aboutValue4Desc: 'Learning directly from qualified scholars and industry professionals.'
   });
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -138,7 +178,7 @@ export function SiteContentManager() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div className="space-y-4">
-            <h4 className="text-sm font-bold border-b pb-2">About Page Content</h4>
+            <h4 className="text-sm font-bold border-b pb-2">About Page Content <span className="text-[10px] text-gray-400 font-normal ml-2 hover:text-green-600 transition-colors cursor-help" title="To color a specific word, wrap it like: <span style='color: red'>word</span>">(HTML allowed for coloring texts)</span></h4>
             <div>
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Main About Title</label>
               <input 
@@ -156,27 +196,68 @@ export function SiteContentManager() {
                 className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm"
               />
             </div>
-            <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Mission Title</label>
-              <input 
-                type="text" 
-                value={settings.missionTitle}
-                onChange={e => setSettings({...settings, missionTitle: e.target.value})}
-                className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
-              />
+            
+            <h4 className="text-sm font-bold border-b pb-2 mt-6">Value 1: Academic Excellence</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Title</label>
+                <input type="text" value={settings.aboutValue1Title} onChange={e => setSettings({...settings, aboutValue1Title: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Description</label>
+                <input type="text" value={settings.aboutValue1Desc} onChange={e => setSettings({...settings, aboutValue1Desc: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
             </div>
-            <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Mission Description</label>
-              <textarea 
-                value={settings.missionDescription}
-                onChange={e => setSettings({...settings, missionDescription: e.target.value})}
-                className="w-full h-32 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm p-4"
-              />
+
+            <h4 className="text-sm font-bold border-b pb-2 mt-6">Value 2: Our Mission</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Title</label>
+                <input 
+                  type="text" 
+                  value={settings.missionTitle}
+                  onChange={e => setSettings({...settings, missionTitle: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Description</label>
+                <input 
+                  type="text"
+                  value={settings.missionDescription}
+                  onChange={e => setSettings({...settings, missionDescription: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm"
+                />
+              </div>
+            </div>
+
+            <h4 className="text-sm font-bold border-b pb-2 mt-6">Value 3: Community First</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Title</label>
+                <input type="text" value={settings.aboutValue3Title} onChange={e => setSettings({...settings, aboutValue3Title: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Description</label>
+                <input type="text" value={settings.aboutValue3Desc} onChange={e => setSettings({...settings, aboutValue3Desc: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
+            </div>
+
+            <h4 className="text-sm font-bold border-b pb-2 mt-6">Value 4: Expert Guidance</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Title</label>
+                <input type="text" value={settings.aboutValue4Title} onChange={e => setSettings({...settings, aboutValue4Title: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Description</label>
+                <input type="text" value={settings.aboutValue4Desc} onChange={e => setSettings({...settings, aboutValue4Desc: e.target.value})} className="w-full px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-sm focus:outline-none" />
+              </div>
             </div>
           </div>
           
           <div className="space-y-4">
-            <h4 className="text-sm font-bold border-b pb-2">Home Hero Content</h4>
+            <h4 className="text-sm font-bold border-b pb-2">Home Hero Content <span className="text-[10px] text-gray-400 font-normal ml-2 hover:text-green-600 transition-colors cursor-help" title="To color a specific word, wrap it like: <span style='color: #0EA5E9'>word</span>">(HTML allowed for coloring texts)</span></h4>
             <div>
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero Badge (Small Text)</label>
               <input 
@@ -203,24 +284,134 @@ export function SiteContentManager() {
                 className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero Image URL (or Video Poster)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Full Screen Background Image URL</label>
                 <input 
                   type="text" 
-                  value={settings.heroImage}
-                  onChange={e => setSettings({...settings, heroImage: e.target.value})}
+                  value={settings.heroBackgroundImage}
+                  onChange={e => setSettings({...settings, heroBackgroundImage: e.target.value})}
+                  placeholder="Leave empty to use the first slider image"
                   className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero YouTube/Vimeo ID</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero Image URLs (Comma separated)</label>
+                <textarea 
+                  value={settings.heroImages}
+                  onChange={e => setSettings({...settings, heroImages: e.target.value})}
+                  placeholder="https://image1.jpg, https://image2.jpg"
+                  className="w-full h-24 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm resize-none"
+                />
+                <p className="mt-1 text-[10px] text-gray-400 italic">
+                  * For Google Drive links, ensure sharing is set to "Anyone with the link can view".
+                </p>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero Support (.mp4) Video URL</label>
                 <input 
                   type="text" 
-                  value={settings.heroVideoId}
-                  onChange={e => setSettings({...settings, heroVideoId: e.target.value})}
+                  value={settings.heroVideoUrl}
+                  onChange={e => setSettings({...settings, heroVideoUrl: e.target.value})}
+                  placeholder="https://.../video.mp4"
                   className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
                 />
+                <p className="mt-1 text-[10px] text-gray-400 italic">Will replace the image slider if provided.</p>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Review Images / Emails (Comma separated)</label>
+                <textarea 
+                  value={settings.heroRatingImages}
+                  onChange={e => setSettings({...settings, heroRatingImages: e.target.value})}
+                  placeholder="user@example.com, https://..."
+                  className="w-full h-24 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm resize-none"
+                />
+                <p className="mt-1 text-[10px] text-gray-400 italic">Emails are auto-converted to profile pictures (Gravatar).</p>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Review / Rating Text</label>
+                <input 
+                  type="text" 
+                  value={settings.heroRatingText}
+                  onChange={e => setSettings({...settings, heroRatingText: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h4 className="text-sm font-bold border-b pb-2 mb-4">Color Palette & Theme</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Nav / Hero Start</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themePrimaryDark} onChange={e => setSettings({...settings, themePrimaryDark: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themePrimaryDark} onChange={e => setSettings({...settings, themePrimaryDark: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero End</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themePrimaryLight} onChange={e => setSettings({...settings, themePrimaryLight: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themePrimaryLight} onChange={e => setSettings({...settings, themePrimaryLight: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Button Bg</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeButtonBg} onChange={e => setSettings({...settings, themeButtonBg: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeButtonBg} onChange={e => setSettings({...settings, themeButtonBg: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Button Hover</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeButtonHover} onChange={e => setSettings({...settings, themeButtonHover: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeButtonHover} onChange={e => setSettings({...settings, themeButtonHover: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Card Bg</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeCardBg} onChange={e => setSettings({...settings, themeCardBg: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeCardBg} onChange={e => setSettings({...settings, themeCardBg: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Card Border</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeCardBorder} onChange={e => setSettings({...settings, themeCardBorder: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeCardBorder} onChange={e => setSettings({...settings, themeCardBorder: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Text Heading</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeTextHeading} onChange={e => setSettings({...settings, themeTextHeading: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeTextHeading} onChange={e => setSettings({...settings, themeTextHeading: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Text Body</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeTextBody} onChange={e => setSettings({...settings, themeTextBody: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeTextBody} onChange={e => setSettings({...settings, themeTextBody: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Footer Bg</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeFooterBg} onChange={e => setSettings({...settings, themeFooterBg: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeFooterBg} onChange={e => setSettings({...settings, themeFooterBg: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Footer Text</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="color" value={settings.themeFooterText} onChange={e => setSettings({...settings, themeFooterText: e.target.value})} className="w-8 h-8 rounded shrink-0" />
+                <input type="text" value={settings.themeFooterText} onChange={e => setSettings({...settings, themeFooterText: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
               </div>
             </div>
           </div>

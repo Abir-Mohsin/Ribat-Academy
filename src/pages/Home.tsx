@@ -1,12 +1,13 @@
-import { getDownloadUrl, getThumbnailUrl } from '@/src/lib/drive';
-import { motion } from 'motion/react';
-import { ArrowRight, Star, Video, BookOpen, GraduationCap, ArrowUpRight, Loader2 } from 'lucide-react';
+import { getDownloadUrl, getThumbnailUrl, getDriveId } from '@/src/lib/drive';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowRight, Star, Video, BookOpen, GraduationCap, ArrowUpRight, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/src/components/Button';
 import { Card } from '@/src/components/Card';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { collection, getDocs, getDoc, doc, limit, query, where } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import md5 from 'blueimp-md5';
 
 export function Home() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -15,6 +16,33 @@ export function Home() {
   const [videoReviews, setVideoReviews] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+
+  const heroImages = settings?.heroImages 
+    ? settings.heroImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
+    : [settings?.heroImage || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"];
+
+  const parseRatingImages = (raw?: string) => {
+    if (!raw) return [];
+    return raw.split(',').map(s => s.trim()).filter(Boolean).map(item => {
+      if (item.includes('@') && !item.startsWith('http')) {
+        const hash = md5(item.toLowerCase());
+        return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+      }
+      return getDownloadUrl(item);
+    });
+  };
+
+  const ratingImages = parseRatingImages(settings?.heroRatingImages);
+
+  useEffect(() => {
+    if (heroImages.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentHeroImage(prev => (prev + 1) % heroImages.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [heroImages.length]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,9 +53,10 @@ export function Home() {
           setSettings(settingsDoc.data());
         }
 
-        // Fetch Courses - broaden query to ensure visibility
-        const coursesSnap = await getDocs(query(collection(db, 'courses'), limit(8)));
-        setCourses(coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        // Fetch Courses
+        const coursesSnap = await getDocs(collection(db, 'courses'));
+        const activeCourses = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })).filter(c => c.status !== 'draft');
+        setCourses(activeCourses.slice(0, 8));
 
         // Fetch Books
         const booksSnap = await getDocs(query(collection(db, 'books'), limit(4)));
@@ -52,23 +81,35 @@ export function Home() {
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative pt-16 pb-24 lg:pt-32 lg:pb-40 px-4">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+      <section className="relative pt-16 pb-24 lg:pt-32 lg:pb-40 px-4 bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary-light)] overflow-hidden">
+        {/* Background Image Layer */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={getDownloadUrl(settings?.heroBackgroundImage || heroImages[0])} 
+            className="w-full h-full object-cover opacity-10" 
+            alt="Hero Background"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
-              <Star size={14} className="fill-blue-600" />
-              {settings?.heroBadge || "Empowering the Next Generation"}
+            <div className="inline-flex items-center gap-2 bg-white/10 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm border border-white/10">
+              <Star size={14} className="fill-white" />
+              <span dangerouslySetInnerHTML={{ __html: settings?.heroBadge || "Empowering the Next Generation" }} />
             </div>
-            <h1 className="text-5xl lg:text-7xl font-bold text-[#111111] leading-[1.1] mb-8">
-              {settings?.heroTitle || "Islamic + Modern Education Platform"}
-            </h1>
-            <p className="text-lg text-gray-500 mb-10 max-w-xl leading-relaxed">
-              {settings?.heroDescription || "Bridging the gap between timeless Islamic values and contemporary skills. Join over 5,000+ students worldwide mastering Arabic, Deen, and Digital Technology."}
-            </p>
+            <h1 
+              className="text-5xl lg:text-7xl font-bold text-[var(--color-text-heading)] leading-[1.1] mb-8"
+              dangerouslySetInnerHTML={{ __html: settings?.heroTitle || "Islamic + Modern Education Platform" }}
+            />
+            <p 
+              className="text-lg text-[var(--color-text-body)] mb-10 max-w-xl leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: settings?.heroDescription || "Bridging the gap between timeless Islamic values and contemporary skills. Join over 5,000+ students worldwide mastering Arabic, Deen, and Digital Technology." }}
+            />
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/courses">
                 <Button size="lg" className="gap-2 group">
@@ -77,7 +118,7 @@ export function Home() {
                 </Button>
               </Link>
               <Link to="/courses?type=live">
-                <Button variant="outline" size="lg" className="gap-2">
+                <Button variant="outline" size="lg" className="gap-2 border-white text-white hover:bg-white hover:text-[var(--color-primary-dark)]">
                   <Video size={20} />
                   Live Classes
                 </Button>
@@ -86,13 +127,22 @@ export function Home() {
             
             <div className="mt-12 flex items-center gap-6">
               <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200" />
-                ))}
+                {ratingImages.length > 0 ? (
+                  ratingImages.map((img: string, i: number) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[var(--color-primary-dark)] bg-gray-200 overflow-hidden">
+                      <img src={img} alt="Student Profile" className="w-full h-full object-cover" />
+                    </div>
+                  ))
+                ) : (
+                  [1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[var(--color-primary-dark)] bg-gray-200" />
+                  ))
+                )}
               </div>
-              <p className="text-sm text-gray-500 font-medium">
-                <span className="text-black font-bold">4.9/5</span> rated by 2,000+ happy students
-              </p>
+              <p 
+                className="text-sm text-[var(--color-text-body)] font-medium"
+                dangerouslySetInnerHTML={{ __html: settings?.heroRatingText || "4.9/5 rated by 2,000+ happy students" }}
+              />
             </div>
           </motion.div>
 
@@ -102,7 +152,7 @@ export function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-200 bg-gray-50 aspect-[4/3]">
+            <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-black/20 bg-gray-50 aspect-[4/3]">
               {settings?.heroVideoId ? (
                 <iframe
                   className="w-full h-full"
@@ -112,12 +162,63 @@ export function Home() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
-              ) : (
-                <img 
-                  src={settings?.heroImage || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"} 
-                  alt="Student learning" 
-                  className="w-full h-full object-cover"
+              ) : settings?.heroVideoUrl ? (
+                <video 
+                  className="w-full h-full object-cover" 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  src={settings.heroVideoUrl} 
                 />
+              ) : (
+                <div className="relative w-full h-full overflow-hidden">
+                  <AnimatePresence initial={false}>
+                    <motion.img 
+                      key={currentHeroImage}
+                      src={getDownloadUrl(heroImages[currentHeroImage])} 
+                      alt={`Hero slide ${currentHeroImage + 1}`} 
+                      initial={{ x: '100%', opacity: 1 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: '-100%', opacity: 1 }}
+                      transition={{ 
+                        x: { type: "spring", stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 }
+                      }}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80";
+                      }}
+                    />
+                  </AnimatePresence>
+
+                  {heroImages.length > 1 && (
+                    <>
+                      <div className="absolute inset-x-0 bottom-6 z-20 flex justify-center gap-2">
+                        {heroImages.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setCurrentHeroImage(i)}
+                            className={`w-2 h-2 rounded-full transition-all ${i === currentHeroImage ? 'w-6 bg-white' : 'bg-white/50'}`}
+                          />
+                        ))}
+                      </div>
+                      <button 
+                        onClick={() => setCurrentHeroImage(prev => (prev - 1 + heroImages.length) % heroImages.length)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-colors z-20"
+                      >
+                        <ChevronLeft size={20} />
+                      </button>
+                      <button 
+                        onClick={() => setCurrentHeroImage(prev => (prev + 1) % heroImages.length)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-colors z-20"
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
             </div>
             <div className="absolute -bottom-6 -right-6 lg:-bottom-10 lg:-right-10 z-20 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-4 max-w-xs">

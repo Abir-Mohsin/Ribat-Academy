@@ -4,6 +4,16 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Poppins", sans-serif;
+  --color-primary-dark: var(--theme-primary-dark, #002D34);
+  --color-primary-light: var(--theme-primary-light, #0B4F4F);
+  --color-button-bg: var(--theme-button-bg, #0B4F4F);
+  --color-button-hover: var(--theme-button-hover, #146868);
+  --color-card-bg: var(--theme-card-bg, #ffffff);
+  --color-card-border: var(--theme-card-border, #E5E7EB);
+  --color-text-heading: var(--theme-text-heading, #ffffff);
+  --color-text-body: var(--theme-text-body, rgba(255, 255, 255, 0.7));
+  --color-footer-bg: var(--theme-footer-bg, #002D34);
+  --color-footer-text: var(--theme-footer-text, #ffffff);
 }
 
 @layer base {

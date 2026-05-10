@@ -19,9 +19,9 @@ export function Button({
   ...props
 }: ButtonProps) {
   const variants = {
-    primary: 'bg-[#111111] text-white hover:bg-black/80',
-    outline: 'border-2 border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white',
-    ghost: 'text-[#111111] hover:bg-gray-100',
+    primary: 'bg-[var(--color-button-bg)] text-white hover:bg-[var(--color-button-hover)]',
+    outline: 'border-2 border-[var(--color-button-bg)] text-[var(--color-button-bg)] hover:bg-[var(--color-button-bg)] hover:text-white',
+    ghost: 'text-[var(--color-button-bg)] hover:bg-[var(--color-button-bg)] hover:bg-opacity-10',
     success: 'bg-[#22C55E] text-white hover:bg-[#16A34A]',
   };
 

@@ -12,7 +12,7 @@ export function About() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const settingsDoc = await getDoc(doc(db, 'settings', 'aboutPage'));
+        const settingsDoc = await getDoc(doc(db, 'settings', 'general'));
         if (settingsDoc.exists()) {
           setSettings(settingsDoc.data());
         }
@@ -37,10 +37,10 @@ export function About() {
   }
 
   const values = [
-    { icon: GraduationCap, title: 'Academic Excellence', desc: 'Rigorous curriculum combining tradition with modern pedagogical methods.' },
+    { icon: GraduationCap, title: settings?.aboutValue1Title || 'Academic Excellence', desc: settings?.aboutValue1Desc || 'Rigorous curriculum combining tradition with modern pedagogical methods.' },
     { icon: Target, title: settings?.missionTitle || 'Our Mission', desc: settings?.missionDescription || 'To provide accessible, high-quality Islamic and modern education to every seeker.' },
-    { icon: Heart, title: 'Community First', desc: 'Fostering a supportive environment for students from all walks of life.' },
-    { icon: Award, title: 'Expert Guidance', desc: 'Learning directly from qualified scholars and industry professionals.' },
+    { icon: Heart, title: settings?.aboutValue3Title || 'Community First', desc: settings?.aboutValue3Desc || 'Fostering a supportive environment for students from all walks of life.' },
+    { icon: Award, title: settings?.aboutValue4Title || 'Expert Guidance', desc: settings?.aboutValue4Desc || 'Learning directly from qualified scholars and industry professionals.' },
   ];
 
   return (
@@ -52,17 +52,15 @@ export function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl lg:text-6xl font-bold mb-8 tracking-tight"
-          >
-            {settings?.aboutTitle || "Bridging Divides. Building Futures."}
-          </motion.h1>
+            dangerouslySetInnerHTML={{ __html: settings?.aboutTitle || "Bridging Divides. Building Futures." }}
+          />
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-xl text-gray-500 leading-relaxed"
-          >
-            {settings?.aboutDescription || "Ribat Academy was founded on a simple belief: that education should be holistic. We don't just teach subjects; we nurture souls and empower minds with the tools they need to succeed in this life and the next."}
-          </motion.p>
+            dangerouslySetInnerHTML={{ __html: settings?.aboutDescription || "Ribat Academy was founded on a simple belief: that education should be holistic. We don't just teach subjects; we nurture souls and empower minds with the tools they need to succeed in this life and the next." }}
+          />
         </div>
       </section>
 
@@ -81,8 +79,8 @@ export function About() {
               <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-6">
                 <v.icon className="text-[#0EA5E9]" size={28} />
               </div>
-              <h3 className="text-lg font-bold mb-3">{v.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{v.desc}</p>
+              <h3 className="text-lg font-bold mb-3" dangerouslySetInnerHTML={{ __html: v.title }} />
+              <p className="text-sm text-gray-500 leading-relaxed" dangerouslySetInnerHTML={{ __html: v.desc }} />
             </motion.div>
           ))}
         </div>

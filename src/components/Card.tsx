@@ -36,8 +36,8 @@ export function Card({
     <motion.div
       whileHover={{ y: -4, boxShadow: '0 12px 24px -10px rgba(0,0,0,0.15)' }}
       className={cn(
-        "bg-[#F5F5F5] rounded-[12px] overflow-hidden flex flex-col group transition-all duration-300",
-        "border border-black/5 shadow-[0_4px_12px_rgba(0,0,0,0.1)]",
+        "bg-[var(--color-card-bg)] rounded-[12px] overflow-hidden flex flex-col group transition-all duration-300",
+        "border border-[var(--color-card-border)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]",
         className
       )}
     >
@@ -85,8 +85,8 @@ export function Card({
           <button
             onClick={onClick}
             className={cn(
-              "bg-[#111111] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-              "hover:bg-[#333333] active:scale-95 duration-200"
+              "bg-[var(--color-button-bg)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              "hover:bg-[var(--color-button-hover)] active:scale-95 duration-200"
             )}
           >
             {buttonText}

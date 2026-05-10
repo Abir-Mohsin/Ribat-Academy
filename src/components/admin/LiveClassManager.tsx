@@ -84,7 +84,7 @@ export function LiveClassManager() {
         await addDoc(collection(db, 'live_classes'), {
           ...data,
           createdAt: serverTimestamp(),
-          status: 'draft',
+          status: 'published',
         });
       }
       setIsEditing(false);
@@ -246,7 +246,7 @@ export function LiveClassManager() {
              startTime: '',
              duration: '',
              meetingLink: '',
-             status: 'draft'
+             status: 'published'
            });
            setIsEditing(true);
          }}>
