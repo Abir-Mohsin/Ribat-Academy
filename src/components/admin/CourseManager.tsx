@@ -179,7 +179,7 @@ export function CourseManager() {
                 value={editingCourse?.description || ''}
                 onChange={content => setEditingCourse({...editingCourse, description: content})}
                 placeholder="Course overview..."
-                className="h-[250px] mb-12"
+                className="h-[350px] mb-16"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export function CourseManager() {
                    instructor: { ...editingCourse?.instructor!, bio: content, role: editingCourse?.instructor?.role || '', name: editingCourse?.instructor?.name || '' } 
                  })}
                  placeholder="Instructor Bio..."
-                 className="h-[150px] mb-8"
+                 className="h-[250px] mb-14"
              />
           </div>
 
@@ -226,7 +226,7 @@ export function CourseManager() {
              <textarea 
                 value={(editingCourse?.objectives || []).join('\n')}
                 onChange={e => setEditingCourse({...editingCourse, objectives: e.target.value.split('\n').filter(o => o.trim() !== '')})}
-                className="w-full h-[120px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none"
+                className="w-full h-[250px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-y"
                 placeholder="Student will learn to...&#10;Master the foundations of...&#10;Understand complete grammar..."
              />
           </div>

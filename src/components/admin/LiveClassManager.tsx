@@ -164,7 +164,7 @@ export function LiveClassManager() {
                 value={editingClass?.description || ''}
                 onChange={content => setEditingClass({...editingClass, description: content})}
                 placeholder="Live class details..."
-                className="h-[150px] mb-8"
+                className="h-[250px] mb-14"
               />
             </div>
           </div>

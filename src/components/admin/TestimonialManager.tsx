@@ -209,7 +209,7 @@ export function TestimonialManager() {
                   value={editingT?.content || ''}
                   onChange={content => setEditingT({...editingT, content})}
                   placeholder="Write student testimonial..."
-                  className="h-[100px] mb-8"
+                  className="h-[200px] mb-12"
                 />
               </div>
 

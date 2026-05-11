@@ -251,7 +251,7 @@ export function BookManager() {
                   value={editingBook?.description || ''}
                   onChange={content => setEditingBook({...editingBook, description: content})}
                   placeholder="Book summary..."
-                  className="h-[150px] mb-8"
+                  className="h-[300px] mb-16"
                 />
               </div>
           </div>

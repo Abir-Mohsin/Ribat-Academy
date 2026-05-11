@@ -54,13 +54,13 @@ export function About() {
             className="text-4xl lg:text-6xl font-bold mb-8 tracking-tight"
             dangerouslySetInnerHTML={{ __html: settings?.aboutTitle || "Bridging Divides. Building Futures." }}
           />
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-gray-500 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: settings?.aboutDescription || "Ribat Academy was founded on a simple belief: that education should be holistic. We don't just teach subjects; we nurture souls and empower minds with the tools they need to succeed in this life and the next." }}
-          />
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-gray-500 leading-relaxed break-words"
+              dangerouslySetInnerHTML={{ __html: settings?.aboutDescription || "Ribat Academy was founded on a simple belief: that education should be holistic. We don't just teach subjects; we nurture souls and empower minds with the tools they need to succeed in this life and the next." }}
+            />
         </div>
       </section>
 
@@ -80,7 +80,7 @@ export function About() {
                 <v.icon className="text-[#0EA5E9]" size={28} />
               </div>
               <h3 className="text-lg font-bold mb-3" dangerouslySetInnerHTML={{ __html: v.title }} />
-              <p className="text-sm text-gray-500 leading-relaxed" dangerouslySetInnerHTML={{ __html: v.desc }} />
+                <p className="text-sm text-gray-500 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: v.desc }} />
             </motion.div>
           ))}
         </div>
@@ -109,7 +109,7 @@ export function About() {
                   </div>
                   <h4 className="text-xl font-bold">{instructor.name}</h4>
                   <p className="text-sm text-[#0EA5E9] font-medium mb-4">{instructor.role}</p>
-                  <div className="text-sm text-gray-500 px-4 line-clamp-3" dangerouslySetInnerHTML={{ __html: instructor.bio || 'No bio available.' }} />
+                  <div className="text-sm text-gray-500 px-4 line-clamp-3 break-words" dangerouslySetInnerHTML={{ __html: instructor.bio || 'No bio available.' }} />
                 </motion.div>
               ))
             ) : (

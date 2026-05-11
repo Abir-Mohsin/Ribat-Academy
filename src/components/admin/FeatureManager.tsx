@@ -163,7 +163,7 @@ export function FeatureManager() {
                      value={currentFeature?.description || ''} 
                      onChange={content => setCurrentFeature({...currentFeature, description: content})}
                      placeholder="Provide details here..."
-                     className="h-[80px] mb-8"
+                     className="h-[200px] mb-12"
                    />
                 </div>
                 <div className="grid grid-cols-2 gap-4">

@@ -154,7 +154,7 @@ export function QuizManager() {
                             setEditingQuiz({...editingQuiz, questions: qs});
                           }}
                           placeholder="Enter question text..."
-                          className="mt-1 h-[100px] mb-8"
+                          className="mt-1 h-[180px] mb-12"
                         />
                       </div>
                       <div>

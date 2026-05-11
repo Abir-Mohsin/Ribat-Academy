@@ -201,7 +201,7 @@ export function SiteContentManager() {
                 value={settings.aboutDescription}
                 onChange={content => setSettings({...settings, aboutDescription: content})}
                 placeholder="Main description..."
-                className="h-[180px] mb-12"
+                className="h-[300px] mb-16"
               />
             </div>
             
@@ -290,7 +290,7 @@ export function SiteContentManager() {
                 value={settings.heroDescription}
                 onChange={content => setSettings({...settings, heroDescription: content})}
                 placeholder="Hero description..."
-                className="h-[180px] mb-12"
+                className="h-[300px] mb-16"
               />
             </div>
             <div className="grid grid-cols-1 gap-4">
@@ -359,7 +359,7 @@ export function SiteContentManager() {
                 value={settings.pageEnrollContent || ''}
                 onChange={content => setSettings({...settings, pageEnrollContent: content})}
                 placeholder="Content for /enroll page..."
-                className="h-[200px] mb-12"
+                className="h-[350px] mb-20"
               />
             </div>
             <div>
@@ -368,7 +368,7 @@ export function SiteContentManager() {
                 value={settings.pageFaqContent || ''}
                 onChange={content => setSettings({...settings, pageFaqContent: content})}
                 placeholder="Content for /faq page..."
-                className="h-[200px] mb-12"
+                className="h-[350px] mb-20"
               />
             </div>
             <div>
@@ -377,7 +377,7 @@ export function SiteContentManager() {
                 value={settings.pagePrivacyContent || ''}
                 onChange={content => setSettings({...settings, pagePrivacyContent: content})}
                 placeholder="Content for /privacy page..."
-                className="h-[200px] mb-12"
+                className="h-[350px] mb-20"
               />
             </div>
           </div>
@@ -550,7 +550,7 @@ export function SiteContentManager() {
                     value={currentInstructor?.bio || ''} 
                     onChange={content => setCurrentInstructor({...currentInstructor, bio: content})}
                     placeholder="Short bio..."
-                    className="h-[150px] mb-10"
+                    className="h-[250px] mb-14"
                    />
                 </div>
                 <Button type="submit" fullWidth>Save Profile</Button>

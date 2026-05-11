@@ -76,7 +76,7 @@ export function Card({
         )}
         {description && (
           <div 
-            className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow"
+            className="text-gray-500 text-sm line-clamp-4 mb-4 flex-grow min-h-[4rem] break-words hyphens-auto text-left"
             dangerouslySetInnerHTML={{ __html: description }}
           />
         )}

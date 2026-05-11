@@ -279,7 +279,7 @@ export function Home() {
                       <IconComponent className="text-white w-5 h-5 md:w-7 md:h-7" />
                     </div>
                     <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight md:leading-tight">{feature.title}</h3>
-                    <p className="text-gray-600 text-[10px] md:text-base leading-relaxed line-clamp-3 md:line-clamp-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                    <p className="text-gray-600 text-[10px] md:text-base leading-relaxed md:line-clamp-none break-words" dangerouslySetInnerHTML={{ __html: feature.description }} />
                   </div>
                 );
               })}
@@ -473,7 +473,7 @@ export function Home() {
                   <div className="flex gap-1 text-amber-400 mb-6">
                     {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
                   </div>
-                  <div className="text-gray-600 italic mb-8 leading-relaxed" dangerouslySetInnerHTML={{ __html: `&ldquo;${t.content}&rdquo;` }} />
+                  <div className="text-gray-600 italic mb-8 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: `&ldquo;${t.content}&rdquo;` }} />
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden">
                       <img src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
