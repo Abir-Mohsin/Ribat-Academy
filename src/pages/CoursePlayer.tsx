@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PlayCircle, CheckCircle, ChevronLeft, ChevronRight, List, ChevronDown, Info, User, Target, Loader2, AlertCircle } from 'lucide-react';
+import { PlayCircle, CheckCircle, ChevronLeft, ChevronRight, List, ChevronDown, Info, User, Target, Loader2, AlertCircle, Video, BookOpen, Headphones, Award, X } from 'lucide-react';
 import { Button } from '@/src/components/Button';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/src/lib/utils';
@@ -8,7 +8,15 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { db, handleFirestoreError, OperationType, serverTimestamp } from '@/src/lib/firebase';
 import { collection, onSnapshot, setDoc, updateDoc, getDoc, query, where, getDocs, doc } from 'firebase/firestore';
 import { QuizModal } from '@/src/components/QuizModal';
-import { Award } from 'lucide-react';
+
+import { CertificateView } from '@/src/components/CertificateView';
+
+const iconMap: Record<string, any> = {
+  PlayCircle: PlayCircle,
+  Video: Video,
+  BookOpen: BookOpen,
+  Headphones: Headphones
+};
 
 // Helper to extract YouTube ID from potential URL
 const getYouTubeId = (url: string) => {
@@ -30,8 +38,26 @@ export function CoursePlayer() {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [quizLessonId, setQuizLessonId] = useState<string | undefined>(undefined);
+  const [availableQuizzes, setAvailableQuizzes] = useState<any[]>([]);
+  const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const [hasCertificate, setHasCertificate] = useState(false);
   const [certData, setCertData] = useState<any>(null);
+  const [showCertView, setShowCertView] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchQuizzes = async () => {
+      try {
+        const q = query(collection(db, 'quizzes'), where('courseId', '==', id), where('status', '==', 'published'));
+        const snap = await getDocs(q);
+        setAvailableQuizzes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch (err) {
+        console.error("Error fetching quizzes:", err);
+      }
+    };
+    fetchQuizzes();
+  }, [id]);
 
   useEffect(() => {
     if (!user || !id) return;
@@ -72,9 +98,12 @@ export function CoursePlayer() {
     const progressId = `${user.uid}_${id}`;
     const unsubscribe = onSnapshot(doc(db, 'progress', progressId), (docSnap) => {
       if (docSnap.exists()) {
-        setCompletedLessons(docSnap.data().completedLessons || []);
+        const data = docSnap.data();
+        setCompletedLessons(data.completedLessons || []);
+        setCompletedQuizzes(data.completedQuizzes || []);
       } else {
         setCompletedLessons([]);
+        setCompletedQuizzes([]);
       }
       setLoadingProgress(false);
     }, (error) => {
@@ -147,28 +176,47 @@ export function CoursePlayer() {
   const currentProgress = Math.round((completedLessons.length / course.lessons.length) * 100);
   const currentLesson = course.lessons[activeLesson];
   const isCurrentLessonCompleted = completedLessons.includes(currentLesson?.id);
+  const currentLessonQuiz = availableQuizzes.find(q => q.lessonId === currentLesson?.id);
+  const isQuizPassed = currentLessonQuiz ? completedQuizzes.includes(currentLessonQuiz.id) : true;
+  const hasFinalQuiz = availableQuizzes.some(q => !q.lessonId || q.lessonId === '');
+
+  const canSwitchToLesson = (index: number) => {
+    // If going backwards, always allowed
+    if (index <= activeLesson) return true;
+    
+    // Check if current lesson is completed AND if it has a quiz, it's passed
+    if (!isCurrentLessonCompleted) return false;
+    if (currentLessonQuiz && !isQuizPassed) return false;
+
+    // Additionally, all previous lessons must be completed and their quizzes passed
+    for (let i = 0; i < index; i++) {
+       const lesson = course.lessons[i];
+       if (!completedLessons.includes(lesson.id)) return false;
+       const q = availableQuizzes.find(qu => qu.lessonId === lesson.id);
+       if (q && !completedQuizzes.includes(q.id)) return false;
+    }
+
+    return true;
+  };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Printable Certificate Area */}
-      {certData && (
-        <div id="certificate-print-area" className="hidden print:block fixed inset-0 bg-white z-[200]">
-          <div className="max-w-[800px] mx-auto my-20 p-20 border-[20px] border-double border-blue-900 text-center font-serif bg-white shadow-2xl relative">
-            <p className="text-4xl text-blue-900 mb-10 font-bold uppercase tracking-[10px]">Certificate of Achievement</p>
-            <p className="text-xl mb-10 italic">This is to certify that</p>
-            <p className="text-6xl mb-12 font-bold text-black border-b-2 border-black inline-block px-10 pb-4">{user?.displayName || userData?.name}</p>
-            <p className="text-xl mb-10 italic">has successfully completed the course</p>
-            <p className="text-4xl mb-20 font-bold text-blue-800">{course.title}</p>
-            <div className="flex justify-between items-end mt-20">
-               <div className="text-left font-sans">
-                 <p className="font-bold border-t-2 border-black pt-2 px-4">Authorized Signature</p>
-                 <p className="text-sm text-gray-500">Ribat Academy Director</p>
-               </div>
-               <div className="text-right font-sans">
-                 <p className="font-bold border-t-2 border-black pt-2 px-4">Issue Date</p>
-                 <p className="text-sm text-gray-500">{new Date().toLocaleDateString()}</p>
-               </div>
-            </div>
+      {/* Certificate Viewer Overlay */}
+      {showCertView && certData && (
+        <div className="fixed inset-0 z-[200] bg-white overflow-y-auto">
+          <div className="absolute top-6 right-6 z-[210]">
+             <Button variant="outline" onClick={() => setShowCertView(false)} className="rounded-full w-12 h-12 p-0 shadow-lg">
+               <X size={24} />
+             </Button>
+          </div>
+          <div className="pt-20">
+            <CertificateView 
+              userName={userData?.name || 'Student'}
+              courseTitle={course.title}
+              issueDate={certData.issuedAt?.toDate ? certData.issuedAt.toDate().toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
+              certificateId={`${course?.id?.slice(0,8)}-${user?.uid?.slice(0,8)}`}
+              onClose={() => setShowCertView(false)}
+            />
           </div>
         </div>
       )}
@@ -202,7 +250,7 @@ export function CoursePlayer() {
                </div>
              )}
              
-             <div className="absolute top-4 right-4 z-10">
+             <div className="absolute top-4 right-4 z-10 flex gap-2">
                 {!isCurrentLessonCompleted ? (
                    <Button 
                     variant="success" 
@@ -247,9 +295,24 @@ export function CoursePlayer() {
              </div>
 
              <div className="max-w-4xl">
-                <p className="text-gray-600 leading-relaxed mb-8">
-                   This lesson covers the fundamental building blocks of the language. Focus on the articulation points (Makharij) and the short vowels (Harakat).
-                </p>
+                <div className="text-gray-600 leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: course.lessons[activeLesson].description || 'This lesson covers the fundamental building blocks of the language. Focus on the articulation points (Makharij) and the short vowels (Harakat).' }} />
+
+                {isCurrentLessonCompleted && currentLessonQuiz && !isQuizPassed && (
+                   <div className="mb-8 p-6 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                         <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                            <Target size={24} />
+                         </div>
+                         <div>
+                            <h4 className="font-bold text-blue-900">Assessment Required</h4>
+                            <p className="text-sm text-blue-600">Please complete the quiz for this lesson to proceed.</p>
+                         </div>
+                      </div>
+                      <Button onClick={() => { setQuizLessonId(currentLesson.id); setIsQuizOpen(true); }} className="whitespace-nowrap">
+                         Take Lesson Quiz
+                      </Button>
+                   </div>
+                )}
 
                 <AnimatePresence>
                   {showDetails && (
@@ -267,9 +330,8 @@ export function CoursePlayer() {
                               <Info size={14} className="text-[#0EA5E9]" />
                               About Course
                             </h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                              {course.description}
-                            </p>
+                            <div className="text-sm text-gray-600 leading-relaxed" 
+                                 dangerouslySetInnerHTML={{ __html: course.description }} />
                           </div>
 
                           <div>
@@ -303,9 +365,8 @@ export function CoursePlayer() {
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{course.instructor.role}</p>
                               </div>
                             </div>
-                            <p className="text-xs text-gray-500 leading-relaxed italic">
-                              "{course.instructor.bio}"
-                            </p>
+                            <div className="text-xs text-gray-500 leading-relaxed italic"
+                                 dangerouslySetInnerHTML={{ __html: course.instructor.bio }} />
                           </div>
                         </div>
                       </div>
@@ -333,12 +394,21 @@ export function CoursePlayer() {
           <div className="flex-grow overflow-y-auto">
              {course.lessons.map((lesson, index) => {
                 const isCompleted = completedLessons.includes(lesson.id);
+                const hasQuiz = availableQuizzes.some(q => q.lessonId === lesson.id);
+                const quizPassed = hasQuiz ? completedQuizzes.includes(availableQuizzes.find(q => q.lessonId === lesson.id)?.id) : true;
+                const locked = index > 0 && (!completedLessons.includes(course.lessons[index-1].id) || (availableQuizzes.find(q => q.lessonId === course.lessons[index-1].id) && !completedQuizzes.includes(availableQuizzes.find(q => q.lessonId === course.lessons[index-1].id)?.id)));
+
                 return (
                   <button
                     key={lesson.id}
-                    onClick={() => setActiveLesson(index)}
+                    disabled={locked}
+                    onClick={() => {
+                       if (canSwitchToLesson(index)) {
+                          setActiveLesson(index);
+                       }
+                    }}
                     className={cn(
-                      "w-full text-left p-6 transition-all border-b border-gray-100 flex gap-4",
+                      "w-full text-left p-6 transition-all border-b border-gray-100 flex gap-4 disabled:opacity-50 disabled:cursor-not-allowed",
                       activeLesson === index ? "bg-white shadow-sm border-l-4 border-l-[#0EA5E9]" : "hover:bg-gray-100"
                     )}
                   >
@@ -350,7 +420,7 @@ export function CoursePlayer() {
                           ? "bg-green-50 border-green-200 text-green-500"
                           : "border-gray-200 text-gray-400"
                     )}>
-                      {isCompleted ? <CheckCircle size={16} /> : index + 1}
+                      {locked ? <Target size={14} className="opacity-50" /> : (isCompleted ? <CheckCircle size={16} /> : index + 1)}
                     </div>
                     <div className="flex-grow">
                       <h4 className={cn(
@@ -360,7 +430,10 @@ export function CoursePlayer() {
                         {lesson.title}
                       </h4>
                       <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                        <PlayCircle size={12} />
+                        {(() => {
+                           const Icon = iconMap[lesson.icon || 'PlayCircle'] || PlayCircle;
+                           return <Icon size={12} />;
+                        })()}
                         {lesson.duration}
                       </div>
                     </div>
@@ -373,14 +446,16 @@ export function CoursePlayer() {
                <div className="p-8 bg-blue-50/50">
                   {hasCertificate ? (
                     <div className="text-center">
-                       <Award className="mx-auto text-green-500 mb-2" size={32} />
+                       <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+                          <Award className="text-green-500" size={32} />
+                       </div>
                        <p className="text-sm font-bold text-green-600 mb-4">Certificate Earned!</p>
                        <div className="space-y-2">
-                         <Button onClick={() => window.print()} variant="primary" size="sm" fullWidth className="gap-2">
-                           <Award size={16} /> Print Certificate
+                         <Button onClick={() => setShowCertView(true)} variant="primary" size="sm" fullWidth className="gap-2 bg-[#0EA5E9] hover:bg-blue-700">
+                           <Award size={16} /> View & Download
                          </Button>
-                         <Link to="/dashboard?tab=profile">
-                           <Button variant="outline" size="sm" fullWidth>My Achievements</Button>
+                         <Link to="/dashboard" className="block">
+                           <Button variant="ghost" size="sm" fullWidth>Back to Dashboard</Button>
                          </Link>
                        </div>
                     </div>
@@ -388,7 +463,7 @@ export function CoursePlayer() {
                     <div className="text-center">
                        <Award className="mx-auto text-[#0EA5E9] mb-2" size={32} />
                        <p className="text-xs text-gray-500 mb-4">You've completed all lessons. Take the final exam to earn your certificate.</p>
-                       <Button fullWidth onClick={() => setIsQuizOpen(true)}>Take Final Exam</Button>
+                       <Button fullWidth onClick={() => { setQuizLessonId(undefined); setIsQuizOpen(true); }}>Take Final Exam</Button>
                     </div>
                   )}
                </div>
@@ -402,10 +477,33 @@ export function CoursePlayer() {
           isOpen={isQuizOpen}
           onClose={() => setIsQuizOpen(false)}
           courseId={id}
+          lessonId={quizLessonId}
           courseTitle={course.title}
           userId={user?.uid || ''}
           userName={userData?.name || 'Student'}
-          onSuccess={() => setHasCertificate(true)}
+          onSuccess={async () => {
+             if (quizLessonId) {
+                // Update progress with completed quiz
+                const progressId = `${user?.uid}_${id}`;
+                const progressRef = doc(db, 'progress', progressId);
+                const quiz = availableQuizzes.find(q => q.lessonId === quizLessonId);
+                if (quiz && !completedQuizzes.includes(quiz.id)) {
+                   const newCompletedQuizzes = [...completedQuizzes, quiz.id];
+                   try {
+                      await setDoc(progressRef, {
+                         userId: user?.uid,
+                         courseId: id,
+                         completedQuizzes: newCompletedQuizzes,
+                         updatedAt: serverTimestamp()
+                      }, { merge: true });
+                   } catch (err) {
+                      console.error("Error updating quiz progress:", err);
+                   }
+                }
+             } else {
+                setHasCertificate(true);
+             }
+          }}
         />
       )}
     </div>

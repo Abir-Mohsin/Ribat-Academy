@@ -3,7 +3,7 @@ import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { Card } from '@/src/components/Card';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { PaymentModal } from '@/src/components/PaymentModal';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { cn } from '@/src/lib/utils';
@@ -14,6 +14,7 @@ export function Courses() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [activeType, setActiveType] = useState<'all' | 'recorded' | 'live'>(
     (searchParams.get('type') === 'live' ? 'live' : 'all') as any
   );
@@ -126,6 +127,8 @@ export function Courses() {
                 subtitle={item.type === 'live_class' ? `Next Session: ${new Date(item.startTime).toLocaleString()}` : item.instructor?.name}
                 badge={item.type === 'live_class' ? 'LIVE' : 'COURSE'}
                 onClick={() => handleEnroll(item)}
+                secondaryButtonText="Details"
+                onSecondaryClick={() => navigate(`/courses/${item.id}`)}
               />
             ))}
           </div>

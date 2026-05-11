@@ -14,6 +14,8 @@ interface CardProps {
   icon?: LucideIcon;
   onClick?: () => void;
   buttonText?: string;
+  onSecondaryClick?: () => void;
+  secondaryButtonText?: string;
   className?: string;
   imageClassName?: string;
   [key: string]: any;
@@ -29,6 +31,8 @@ export function Card({
   icon: Icon,
   onClick,
   buttonText = 'Enroll Now',
+  onSecondaryClick,
+  secondaryButtonText,
   className,
   imageClassName,
 }: CardProps) {
@@ -71,26 +75,40 @@ export function Card({
           </p>
         )}
         {description && (
-          <p className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow">
-            {description}
-          </p>
+          <div 
+            className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
         )}
         
-        <div className="flex items-center justify-between mt-auto pt-2">
+        <div className="flex flex-col gap-2 mt-auto pt-2">
           {price !== undefined && (
-            <div className="text-[#111111] font-bold text-lg">
+            <div className="text-[#111111] font-bold text-lg mb-1">
               ৳{price}
             </div>
           )}
-          <button
-            onClick={onClick}
-            className={cn(
-              "bg-[var(--color-button-bg)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-              "hover:bg-[var(--color-button-hover)] active:scale-95 duration-200"
+          <div className="flex items-center gap-2">
+            {secondaryButtonText && onSecondaryClick && (
+              <button
+                onClick={onSecondaryClick}
+                className={cn(
+                  "flex-1 bg-gray-100 text-black px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200",
+                  "hover:bg-gray-200 active:scale-95 duration-200"
+                )}
+              >
+                {secondaryButtonText}
+              </button>
             )}
-          >
-            {buttonText}
-          </button>
+            <button
+              onClick={onClick}
+              className={cn(
+                "flex-1 bg-[var(--color-button-bg)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                "hover:bg-[var(--color-button-hover)] active:scale-95 duration-200"
+              )}
+            >
+              {buttonText}
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

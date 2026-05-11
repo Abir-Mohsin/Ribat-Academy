@@ -3,11 +3,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Star, Video, BookOpen, GraduationCap, ArrowUpRight, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/src/components/Button';
 import { Card } from '@/src/components/Card';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { collection, getDocs, getDoc, doc, limit, query, where } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import md5 from 'blueimp-md5';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { PaymentModal } from '@/src/components/PaymentModal';
+
+import * as Icons from 'lucide-react';
 
 export function Home() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -15,8 +19,21 @@ export function Home() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [videoReviews, setVideoReviews] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [homeFeatures, setHomeFeatures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  
+  const navigate = useNavigate();
+  const { user, signInWithGoogle } = useAuth();
+
+  const handleEnroll = (item: any, type: 'course' | 'book') => {
+    if (!user) {
+      signInWithGoogle();
+      return;
+    }
+    setSelectedItem({ ...item, type });
+  };
 
   const heroImages = settings?.heroImages 
     ? settings.heroImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
@@ -52,6 +69,10 @@ export function Home() {
         if (settingsDoc.exists()) {
           setSettings(settingsDoc.data());
         }
+
+        // Fetch Features
+        const featuresSnap = await getDocs(query(collection(db, 'home_features')));
+        setHomeFeatures(featuresSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as any })).sort((a,b) => (a.order || 0) - (b.order || 0)));
 
         // Fetch Courses
         const coursesSnap = await getDocs(collection(db, 'courses'));
@@ -239,31 +260,58 @@ export function Home() {
       {/* Academy Features */}
       <section className="py-24 bg-white px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-10 bg-blue-50 rounded-[40px] border border-blue-100 group hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-500">
-              <div className="w-14 h-14 bg-[#0EA5E9] rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
-                <GraduationCap className="text-white" size={28} />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 tracking-tight">Structured Learning</h3>
-              <p className="text-gray-600 leading-relaxed">Our curriculum is designed by education experts to take you from basics to mastery in record time.</p>
+          {homeFeatures && homeFeatures.length > 0 ? (
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+              {homeFeatures.map(feature => {
+                const IconComponent = (Icons as any)[feature.icon] || Icons.Star;
+                const colors: any = {
+                  blue: { bg: 'bg-blue-50', border: 'border-blue-100', iconBg: 'bg-[#0EA5E9]', hover: 'hover:shadow-blue-200/50' },
+                  green: { bg: 'bg-green-50', border: 'border-green-100', iconBg: 'bg-green-500', hover: 'hover:shadow-green-200/50' },
+                  amber: { bg: 'bg-amber-50', border: 'border-amber-100', iconBg: 'bg-amber-500', hover: 'hover:shadow-amber-200/50' },
+                  purple: { bg: 'bg-purple-50', border: 'border-purple-100', iconBg: 'bg-purple-500', hover: 'hover:shadow-purple-200/50' },
+                  rose: { bg: 'bg-rose-50', border: 'border-rose-100', iconBg: 'bg-rose-500', hover: 'hover:shadow-rose-200/50' }
+                };
+                const c = colors[feature.colorClass] || colors.blue;
+                
+                return (
+                  <div key={feature.id} className={`w-[calc(33.333%-0.75rem)] md:w-[calc(33.333%-2rem)] p-4 md:p-10 ${c.bg} rounded-2xl md:rounded-[40px] border ${c.border} group hover:shadow-2xl ${c.hover} transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left`}>
+                    <div className={`w-10 h-10 md:w-14 md:h-14 ${c.iconBg} rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-black/5 group-hover:scale-110 transition-transform`}>
+                      <IconComponent className="text-white w-5 h-5 md:w-7 md:h-7" />
+                    </div>
+                    <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight md:leading-tight">{feature.title}</h3>
+                    <p className="text-gray-600 text-[10px] md:text-base leading-relaxed line-clamp-3 md:line-clamp-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                  </div>
+                );
+              })}
             </div>
-            
-            <div className="p-10 bg-green-50 rounded-[40px] border border-green-100 group hover:shadow-2xl hover:shadow-green-200/50 transition-all duration-500">
-              <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
-                <Video className="text-white" size={28} />
+          ) : (
+             <div className="grid grid-cols-3 gap-4 md:gap-8">
+              <div className="p-4 md:p-10 bg-blue-50 rounded-2xl md:rounded-[40px] border border-blue-100 group hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-[#0EA5E9] rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                  <GraduationCap className="text-white w-5 h-5 md:w-7 md:h-7" />
+                </div>
+                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Learning</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed">Our curriculum is designed by education experts to take you from basics to mastery.</p>
               </div>
-              <h3 className="text-2xl font-bold mb-4 tracking-tight">Daily Live Sessions</h3>
-              <p className="text-gray-600 leading-relaxed">Interact with qualified instructors daily. Get your questions answered instantly in real-time.</p>
-            </div>
+              
+              <div className="p-4 md:p-10 bg-green-50 rounded-2xl md:rounded-[40px] border border-green-100 group hover:shadow-2xl hover:shadow-green-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-green-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
+                  <Video className="text-white w-5 h-5 md:w-7 md:h-7" />
+                </div>
+                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Live Classes</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed">Interact with qualified instructors daily. Get your questions answered instantly.</p>
+              </div>
 
-            <div className="p-10 bg-amber-50 rounded-[40px] border border-amber-100 group hover:shadow-2xl hover:shadow-amber-200/50 transition-all duration-500">
-              <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                <BookOpen className="text-white" size={28} />
+
+               <div className="p-4 md:p-10 bg-amber-50 rounded-2xl md:rounded-[40px] border border-amber-100 group hover:shadow-2xl hover:shadow-amber-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-amber-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                  <BookOpen className="text-white w-5 h-5 md:w-7 md:h-7" />
+                </div>
+                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Resources</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed">Access hundreds of PDF books, quizzes, and recorded lectures anytime.</p>
               </div>
-              <h3 className="text-2xl font-bold mb-4 tracking-tight">Comprehensive Resources</h3>
-              <p className="text-gray-600 leading-relaxed">Access hundreds of PDF books, quizzes, and recorded lectures anytime, anywhere.</p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -300,6 +348,9 @@ export function Home() {
                   price={course.price}
                   image={course.thumbnail}
                   badge={course.badge || 'New'}
+                  onClick={() => handleEnroll(course, 'course')}
+                  secondaryButtonText="Details"
+                  onSecondaryClick={() => navigate(`/courses/${course.id}`)}
                  />
                ))
             ) : (
@@ -422,7 +473,7 @@ export function Home() {
                   <div className="flex gap-1 text-amber-400 mb-6">
                     {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
                   </div>
-                  <p className="text-gray-600 italic mb-8 leading-relaxed">"{t.content}"</p>
+                  <div className="text-gray-600 italic mb-8 leading-relaxed" dangerouslySetInnerHTML={{ __html: `&ldquo;${t.content}&rdquo;` }} />
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden">
                       <img src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
@@ -449,6 +500,13 @@ export function Home() {
         </div>
       </section>
 
+      {selectedItem && (
+        <PaymentModal 
+          isOpen={!!selectedItem} 
+          onClose={() => setSelectedItem(null)} 
+          item={selectedItem}
+        />
+      )}
     </div>
   );
 }

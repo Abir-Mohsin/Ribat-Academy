@@ -48,7 +48,7 @@ export function Footer() {
           <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-[var(--color-footer-text)] opacity-90">Support</h4>
           <ul className="space-y-4">
             <li><Link to="/dashboard" className="text-[var(--color-footer-text)] opacity-60 hover:opacity-100 transition-colors">Student Login</Link></li>
-            <li><Link to="/contact" className="text-[var(--color-footer-text)] opacity-60 hover:opacity-100 transition-colors">Contact Support</Link></li>
+            <li><Link to="/about#contact" className="text-[var(--color-footer-text)] opacity-60 hover:opacity-100 transition-colors">Contact Support</Link></li>
             <li><Link to="/faq" className="text-[var(--color-footer-text)] opacity-60 hover:opacity-100 transition-colors">FAQ</Link></li>
             <li><Link to="/terms" className="text-[var(--color-footer-text)] opacity-60 hover:opacity-100 transition-colors">Privacy Policy</Link></li>
           </ul>

@@ -20,7 +20,9 @@ import {
   Loader2,
   Video,
   MessageSquare,
-  Info
+  Info,
+  Star,
+  Award
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { Button } from '@/src/components/Button';
@@ -33,6 +35,9 @@ import { TestimonialManager } from '@/src/components/admin/TestimonialManager';
 import { VideoReviewManager } from '@/src/components/admin/VideoReviewManager';
 import { SiteContentManager } from '@/src/components/admin/SiteContentManager';
 import { LiveClassManager } from '@/src/components/admin/LiveClassManager';
+import { FeatureManager } from '@/src/components/admin/FeatureManager';
+import { QuizManager } from '@/src/components/admin/QuizManager';
+import { CertificateDesigner } from '@/src/components/admin/CertificateDesigner';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState('stats');
@@ -62,17 +67,18 @@ export function AdminPanel() {
       const approvedOrders = allOrders.filter((o: any) => o.status === 'approved');
       const pendingOrders = allOrders.filter((o: any) => o.status === 'pending');
       
-      const total = approvedOrders.reduce((acc, curr: any) => acc + (curr.price || 0), 0);
+      const total = approvedOrders.reduce((acc, curr: any) => acc + (curr.amount || curr.price || 0), 0);
+      const uniqueStudents = new Set(approvedOrders.map((o: any) => o.userId)).size;
       setStats(prev => ({ 
         ...prev, 
         totalSales: total,
-        pendingApprovals: pendingOrders.length
+        pendingApprovals: pendingOrders.length,
+        activeStudents: uniqueStudents
       }));
     });
 
     const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-      const studentCount = snapshot.docs.filter(doc => doc.data().role !== 'admin').length;
-      setStats(prev => ({ ...prev, activeStudents: studentCount }));
+      // Just keep for users table, active students now tracked via orders
     });
 
     const unsubCourses = onSnapshot(collection(db, 'courses'), (snapshot) => {
@@ -146,10 +152,13 @@ export function AdminPanel() {
     { id: 'courses', name: 'Manage Courses', icon: BookOpen },
     { id: 'live-classes', name: 'Live Classes', icon: Video },
     { id: 'books', name: 'Manage Books', icon: BookIcon },
+    { id: 'quizzes', name: 'Quizzes & Assessments', icon: CheckCircle },
     { id: 'payments', name: 'Approve Payments', icon: CreditCard },
     { id: 'testimonials', name: 'Text Reviews', icon: MessageSquare },
     { id: 'video-reviews', name: 'Video Reviews', icon: Video },
     { id: 'about', name: 'Site Editor', icon: Info },
+    { id: 'features', name: 'Home Features', icon: Star },
+    { id: 'certificates', name: 'Certificates', icon: Award },
     { id: 'users', name: 'User Management', icon: Users },
   ];
 
@@ -210,6 +219,7 @@ export function AdminPanel() {
         {activeTab === 'courses' && <CourseManager />}
         {activeTab === 'live-classes' && <LiveClassManager />}
         {activeTab === 'books' && <BookManager />}
+        {activeTab === 'quizzes' && <QuizManager />}
 
         {activeTab === 'users' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -318,6 +328,12 @@ export function AdminPanel() {
         )}
         {activeTab === 'about' && (
           <SiteContentManager />
+        )}
+        {activeTab === 'features' && (
+          <FeatureManager />
+        )}
+        {activeTab === 'certificates' && (
+          <CertificateDesigner />
         )}
       </main>
     </div>

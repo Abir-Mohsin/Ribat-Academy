@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { Button } from '@/src/components/Button';
 import { cn } from '@/src/lib/utils';
 
@@ -204,12 +205,11 @@ export function TestimonialManager() {
 
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Review Content</label>
-                <textarea 
-                  required
+                <RichTextEditor 
                   value={editingT?.content || ''}
-                  onChange={e => setEditingT({...editingT, content: e.target.value})}
-                  className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm leading-relaxed"
+                  onChange={content => setEditingT({...editingT, content})}
                   placeholder="Write student testimonial..."
+                  className="h-[100px] mb-8"
                 />
               </div>
 

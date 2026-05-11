@@ -109,7 +109,7 @@ export function About() {
                   </div>
                   <h4 className="text-xl font-bold">{instructor.name}</h4>
                   <p className="text-sm text-[#0EA5E9] font-medium mb-4">{instructor.role}</p>
-                  <p className="text-sm text-gray-500 px-4 line-clamp-3">{instructor.bio}</p>
+                  <div className="text-sm text-gray-500 px-4 line-clamp-3" dangerouslySetInnerHTML={{ __html: instructor.bio || 'No bio available.' }} />
                 </motion.div>
               ))
             ) : (
@@ -122,6 +122,46 @@ export function About() {
               ))
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Contact Support Section */}
+      <section className="py-24 px-4 bg-gray-50 border-t border-gray-100" id="contact">
+        <div className="max-w-3xl mx-auto bg-white p-10 md:p-12 rounded-[40px] shadow-sm border border-gray-100">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4">Contact Support</h2>
+            <p className="text-gray-500">Have any questions? We'd love to hear from you.</p>
+          </div>
+          
+          <form action="https://formsubmit.co/abirmohsin02@gmail.com" method="POST" className="space-y-6">
+            <input type="text" name="_honey" style={{ display: 'none' }} />
+            <input type="hidden" name="_captcha" value="false" />
+            
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Full Name</label>
+              <input type="text" name="Name" required placeholder="John Doe" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]" />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Email</label>
+                <input type="email" name="Email" required placeholder="john@example.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Address</label>
+                <input type="text" name="Address" required placeholder="Your address here" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Message</label>
+              <textarea name="Message" required rows={5} placeholder="How can we help you?" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] resize-none"></textarea>
+            </div>
+
+            <button type="submit" className="w-full py-4 bg-[#111111] hover:bg-black text-white font-bold rounded-xl transition-all">
+              Send Message
+            </button>
+          </form>
         </div>
       </section>
     </div>

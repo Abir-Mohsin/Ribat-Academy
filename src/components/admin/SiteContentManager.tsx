@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { collection, doc, getDoc, setDoc, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { Button } from '@/src/components/Button';
 import { cn } from '@/src/lib/utils';
 
@@ -54,6 +55,9 @@ interface SiteSettings {
   aboutValue3Desc: string;
   aboutValue4Title: string;
   aboutValue4Desc: string;
+  pageEnrollContent?: string;
+  pageFaqContent?: string;
+  pagePrivacyContent?: string;
 }
 
 export function SiteContentManager() {
@@ -87,7 +91,10 @@ export function SiteContentManager() {
     aboutValue3Title: 'Community First',
     aboutValue3Desc: 'Fostering a supportive environment for students from all walks of life.',
     aboutValue4Title: 'Expert Guidance',
-    aboutValue4Desc: 'Learning directly from qualified scholars and industry professionals.'
+    aboutValue4Desc: 'Learning directly from qualified scholars and industry professionals.',
+    pageEnrollContent: '',
+    pageFaqContent: '',
+    pagePrivacyContent: ''
   });
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -190,10 +197,11 @@ export function SiteContentManager() {
             </div>
             <div>
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Main Description</label>
-              <textarea 
+              <RichTextEditor 
                 value={settings.aboutDescription}
-                onChange={e => setSettings({...settings, aboutDescription: e.target.value})}
-                className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm"
+                onChange={content => setSettings({...settings, aboutDescription: content})}
+                placeholder="Main description..."
+                className="h-[180px] mb-12"
               />
             </div>
             
@@ -278,10 +286,11 @@ export function SiteContentManager() {
             </div>
             <div>
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Hero Description</label>
-              <textarea 
+              <RichTextEditor 
                 value={settings.heroDescription}
-                onChange={e => setSettings({...settings, heroDescription: e.target.value})}
-                className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans text-sm"
+                onChange={content => setSettings({...settings, heroDescription: content})}
+                placeholder="Hero description..."
+                className="h-[180px] mb-12"
               />
             </div>
             <div className="grid grid-cols-1 gap-4">
@@ -337,6 +346,39 @@ export function SiteContentManager() {
                   className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h4 className="text-sm font-bold border-b pb-2 mb-4 mt-8">Custom Pages Content <span className="text-[10px] text-gray-400 font-normal ml-2">(HTML allowed)</span></h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">How to Enroll Page</label>
+              <RichTextEditor 
+                value={settings.pageEnrollContent || ''}
+                onChange={content => setSettings({...settings, pageEnrollContent: content})}
+                placeholder="Content for /enroll page..."
+                className="h-[200px] mb-12"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">FAQ Page</label>
+              <RichTextEditor 
+                value={settings.pageFaqContent || ''}
+                onChange={content => setSettings({...settings, pageFaqContent: content})}
+                placeholder="Content for /faq page..."
+                className="h-[200px] mb-12"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Privacy Policy Page</label>
+              <RichTextEditor 
+                value={settings.pagePrivacyContent || ''}
+                onChange={content => setSettings({...settings, pagePrivacyContent: content})}
+                placeholder="Content for /privacy page..."
+                className="h-[200px] mb-12"
+              />
             </div>
           </div>
         </div>
@@ -504,9 +546,12 @@ export function SiteContentManager() {
                 </div>
                 <div>
                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Short Bio</label>
-                   <textarea value={currentInstructor?.bio || ''} 
-                    onChange={e => setCurrentInstructor({...currentInstructor, bio: e.target.value})}
-                    className="w-full h-24 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none resize-none" />
+                   <RichTextEditor 
+                    value={currentInstructor?.bio || ''} 
+                    onChange={content => setCurrentInstructor({...currentInstructor, bio: content})}
+                    placeholder="Short bio..."
+                    className="h-[150px] mb-10"
+                   />
                 </div>
                 <Button type="submit" fullWidth>Save Profile</Button>
              </form>

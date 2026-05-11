@@ -12,6 +12,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { 
   Plus, 
   Trash2, 
@@ -30,8 +31,10 @@ import { cn } from '@/src/lib/utils';
 interface Lesson {
   id: string;
   title: string;
+  description?: string;
   videoId: string;
   duration: string;
+  icon?: string;
 }
 
 interface Course {
@@ -172,12 +175,11 @@ export function CourseManager() {
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
-              <textarea 
+              <RichTextEditor 
                 value={editingCourse?.description || ''}
-                onChange={e => setEditingCourse({...editingCourse, description: e.target.value})}
-                className="w-full h-[180px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none"
+                onChange={content => setEditingCourse({...editingCourse, description: content})}
                 placeholder="Course overview..."
-                required
+                className="h-[250px] mb-12"
               />
             </div>
           </div>
@@ -190,7 +192,7 @@ export function CourseManager() {
                  value={editingCourse?.instructor?.name || ''}
                  onChange={e => setEditingCourse({
                    ...editingCourse, 
-                   instructor: { ...editingCourse?.instructor!, name: e.target.value } 
+                   instructor: { ...editingCourse?.instructor!, name: e.target.value, bio: editingCourse?.instructor?.bio || '', role: editingCourse?.instructor?.role || '' } 
                  })}
                  placeholder="Instructor Name"
                  className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100"
@@ -200,12 +202,33 @@ export function CourseManager() {
                  value={editingCourse?.instructor?.role || ''}
                  onChange={e => setEditingCourse({
                    ...editingCourse, 
-                   instructor: { ...editingCourse?.instructor!, role: e.target.value } 
+                   instructor: { ...editingCourse?.instructor!, role: e.target.value, bio: editingCourse?.instructor?.bio || '', name: editingCourse?.instructor?.name || '' } 
                  })}
                  placeholder="Role (e.g. Arabic Lingust)"
                  className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100"
                />
             </div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Instructor Bio</label>
+            <RichTextEditor
+                 value={editingCourse?.instructor?.bio || ''}
+                 onChange={content => setEditingCourse({
+                   ...editingCourse, 
+                   instructor: { ...editingCourse?.instructor!, bio: content, role: editingCourse?.instructor?.role || '', name: editingCourse?.instructor?.name || '' } 
+                 })}
+                 placeholder="Instructor Bio..."
+                 className="h-[150px] mb-8"
+             />
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-gray-50">
+             <h4 className="font-bold text-sm">Detailed Learning Objectives</h4>
+             <p className="text-[10px] text-gray-400 -mt-2">Enter one objective per line. These will be displayed as a bulleted list.</p>
+             <textarea 
+                value={(editingCourse?.objectives || []).join('\n')}
+                onChange={e => setEditingCourse({...editingCourse, objectives: e.target.value.split('\n').filter(o => o.trim() !== '')})}
+                className="w-full h-[120px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none"
+                placeholder="Student will learn to...&#10;Master the foundations of...&#10;Understand complete grammar..."
+             />
           </div>
 
           <div className="space-y-4 pt-4 border-t border-gray-50">
@@ -226,57 +249,91 @@ export function CourseManager() {
                 Add Lesson
               </Button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-6">
               {editingCourse?.lessons?.map((lesson, index) => (
-                <div key={lesson.id} className="flex gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 group">
-                  <div className="mt-3 text-gray-300">
-                    <GripVertical size={16} />
+                <div key={lesson.id} className="p-4 bg-gray-50 rounded-xl border border-gray-100 group">
+                  <div className="flex gap-3 mb-4">
+                    <div className="mt-3 text-gray-300">
+                      <GripVertical size={16} />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-grow">
+                       <input 
+                         type="text" 
+                         value={lesson.title}
+                         onChange={e => {
+                           const lessons = [...(editingCourse.lessons || [])];
+                           lessons[index].title = e.target.value;
+                           setEditingCourse({ ...editingCourse, lessons });
+                         }}
+                         placeholder="Lesson Title"
+                         className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
+                       />
+                       <input 
+                         type="text" 
+                         value={lesson.videoId}
+                         onChange={e => {
+                           const lessons = [...(editingCourse.lessons || [])];
+                           lessons[index].videoId = e.target.value;
+                           setEditingCourse({ ...editingCourse, lessons });
+                         }}
+                         placeholder="YouTube/Vimeo ID"
+                         className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
+                       />
+                       <input 
+                         type="text" 
+                         value={lesson.duration}
+                         onChange={e => {
+                           const lessons = [...(editingCourse.lessons || [])];
+                           lessons[index].duration = e.target.value;
+                           setEditingCourse({ ...editingCourse, lessons });
+                         }}
+                         placeholder="Duration (e.g. 10:00)"
+                         className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
+                       />
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const lessons = editingCourse.lessons?.filter((_, i) => i !== index);
+                        setEditingCourse({ ...editingCourse, lessons });
+                      }}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-grow">
-                     <input 
-                       type="text" 
-                       value={lesson.title}
-                       onChange={e => {
-                         const lessons = [...(editingCourse.lessons || [])];
-                         lessons[index].title = e.target.value;
-                         setEditingCourse({ ...editingCourse, lessons });
-                       }}
-                       placeholder="Lesson Title"
-                       className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
-                     />
-                     <input 
-                       type="text" 
-                       value={lesson.videoId}
-                       onChange={e => {
-                         const lessons = [...(editingCourse.lessons || [])];
-                         lessons[index].videoId = e.target.value;
-                         setEditingCourse({ ...editingCourse, lessons });
-                       }}
-                       placeholder="YouTube/Vimeo ID"
-                       className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
-                     />
-                     <input 
-                       type="text" 
-                       value={lesson.duration}
-                       onChange={e => {
-                         const lessons = [...(editingCourse.lessons || [])];
-                         lessons[index].duration = e.target.value;
-                         setEditingCourse({ ...editingCourse, lessons });
-                       }}
-                       placeholder="Duration (e.g. 10:00)"
-                       className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm"
-                     />
+                  <div className="ml-7 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Lesson Icon</label>
+                      <select
+                        value={lesson.icon || 'PlayCircle'}
+                        onChange={e => {
+                          const lessons = [...(editingCourse.lessons || [])];
+                          lessons[index].icon = e.target.value;
+                          setEditingCourse({ ...editingCourse, lessons });
+                        }}
+                        className="px-3 py-2 bg-white rounded-lg border border-gray-100 text-sm w-full md:w-auto"
+                      >
+                        <option value="PlayCircle">Play Icon</option>
+                        <option value="Video">Video Icon</option>
+                        <option value="BookOpen">Document Icon</option>
+                        <option value="Headphones">Audio Icon</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Lesson Content/Description</label>
+                      <RichTextEditor
+                         value={lesson.description || ''}
+                         onChange={content => {
+                           const lessons = [...(editingCourse.lessons || [])];
+                           lessons[index].description = content;
+                           setEditingCourse({ ...editingCourse, lessons });
+                         }}
+                         placeholder="Detail about this lesson..."
+                         className="h-[120px] mb-10"
+                      />
+                    </div>
                   </div>
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const lessons = editingCourse.lessons?.filter((_, i) => i !== index);
-                      setEditingCourse({ ...editingCourse, lessons });
-                    }}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
               ))}
               {(!editingCourse?.lessons || editingCourse.lessons.length === 0) && (

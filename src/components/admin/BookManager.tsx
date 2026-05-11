@@ -11,7 +11,8 @@ import {
   query,
   serverTimestamp 
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import { db, handleFirestoreError, OperationType, storage } from '@/src/lib/firebase';
+import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { 
   Plus, 
   Trash2, 
@@ -27,7 +28,6 @@ import {
 import { Button } from '@/src/components/Button';
 import { cn } from '@/src/lib/utils';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/src/lib/firebase';
 
 interface Book {
   id?: string;
@@ -247,12 +247,11 @@ export function BookManager() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
-                <textarea 
+                <RichTextEditor 
                   value={editingBook?.description || ''}
-                  onChange={e => setEditingBook({...editingBook, description: e.target.value})}
-                  className="w-full h-32 px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none font-sans"
+                  onChange={content => setEditingBook({...editingBook, description: content})}
                   placeholder="Book summary..."
-                  required
+                  className="h-[150px] mb-8"
                 />
               </div>
           </div>

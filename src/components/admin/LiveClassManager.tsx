@@ -12,6 +12,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
+import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { 
   Plus, 
   Trash2, 
@@ -159,11 +160,11 @@ export function LiveClassManager() {
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
-              <textarea 
+              <RichTextEditor 
                 value={editingClass?.description || ''}
-                onChange={e => setEditingClass({...editingClass, description: e.target.value})}
-                className="w-full h-[180px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-none"
-                required
+                onChange={content => setEditingClass({...editingClass, description: content})}
+                placeholder="Live class details..."
+                className="h-[150px] mb-8"
               />
             </div>
           </div>

@@ -14,6 +14,10 @@ import { About } from './pages/About';
 import { Dashboard } from './pages/Dashboard';
 import { AdminPanel } from './pages/AdminPanel';
 import { CoursePlayer } from './pages/CoursePlayer';
+import { CustomPage } from './pages/CustomPage';
+import { CourseDetails } from './pages/CourseDetails';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { ScrollToTop } from './components/ScrollToTop';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { user, userData, loading } = useAuth();
@@ -58,8 +62,14 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:id" element={<CourseDetails />} />
           <Route path="/books" element={<Books />} />
           <Route path="/about" element={<About />} />
+          <Route path="/enroll" element={<CustomPage type="enroll" title="How to Enroll" />} />
+          <Route path="/faq" element={<CustomPage type="faq" title="Frequently Asked Questions" />} />
+          <Route path="/privacy" element={<CustomPage type="privacy" title="Privacy Policy" />} />
+          <Route path="/terms" element={<CustomPage type="privacy" title="Terms & Privacy Policy" />} />
+          <Route path="/contact" element={<Navigate to="/about#contact" />} />
           <Route 
             path="/dashboard/*" 
             element={
@@ -87,6 +97,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 }
@@ -94,6 +105,7 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <AppContent />
       </AuthProvider>

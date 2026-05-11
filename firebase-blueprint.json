@@ -135,6 +135,23 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    },
+    "CertificateSettings": {
+      "title": "Certificate Settings",
+      "description": "Global configuration for certificates.",
+      "type": "object",
+      "properties": {
+        "backgroundUrl": { "type": "string" },
+        "textColor": { "type": "string" },
+        "nameTop": { "type": "number" },
+        "nameFontSize": { "type": "number" },
+        "courseTop": { "type": "number" },
+        "courseFontSize": { "type": "number" },
+        "dateTop": { "type": "number" },
+        "dateLeft": { "type": "number" },
+        "idTop": { "type": "number" },
+        "idLeft": { "type": "number" }
+      }
     }
   },
   "firestore": {
@@ -169,6 +186,10 @@
     "notifications/{notifId}": {
       "schema": "Notification",
       "description": "User notifications."
+    },
+    "settings/{settingId}": {
+      "schema": "CertificateSettings",
+      "description": "Global settings including certificate configuration."
     }
   }
 }

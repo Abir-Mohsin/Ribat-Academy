@@ -6,6 +6,8 @@ import { cn } from '@/src/lib/utils';
 import { db, handleFirestoreError, OperationType, serverTimestamp } from '@/src/lib/firebase';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 
+import { CertificateView } from './CertificateView';
+
 interface QuizModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,38 +16,79 @@ interface QuizModalProps {
   userId: string;
   userName: string;
   onSuccess: () => void;
+  lessonId?: string;
 }
 
-export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, userName, onSuccess }: QuizModalProps) {
+export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, userName, onSuccess, lessonId }: QuizModalProps) {
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [writtenAnswer, setWrittenAnswer] = useState('');
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
   const [isIssuing, setIsIssuing] = useState(false);
   const [hasCertificate, setHasCertificate] = useState(false);
+  const [showCertView, setShowCertView] = useState(false);
+  const [issuedCertId, setIssuedCertId] = useState<string | null>(null);
+
+  const totalPossibleScore = quiz?.questions?.reduce((acc: number, cur: any) => acc + (cur.marks || 1), 0) || 0;
+  const passingThreshold = (totalPossibleScore * (quiz?.passingScore ?? quiz?.passMark ?? 70)) / 100;
 
   useEffect(() => {
     if (isOpen) {
       fetchQuiz();
+      checkExistingCertificate();
+    } else {
+      // Reset state when closing
+      setShowResult(false);
+      setFinalScore(null);
+      setCurrentQuestion(0);
+      setScore(0);
+      setSelectedOption(null);
+      setWrittenAnswer('');
+      setShowCertView(false);
     }
-  }, [isOpen, courseId]);
+  }, [isOpen, courseId, lessonId]);
+
+  const checkExistingCertificate = async () => {
+    if (lessonId) return; // Only for final quizzes
+    try {
+      const q = query(
+        collection(db, 'certificates'),
+        where('userId', '==', userId),
+        where('courseId', '==', courseId)
+      );
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        setHasCertificate(true);
+        setIssuedCertId(snap.docs[0].id);
+      }
+    } catch (e) {
+      console.error("Error checking certificate:", e);
+    }
+  };
 
   const fetchQuiz = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, 'quizzes'), where('courseId', '==', courseId));
+      const q = query(
+        collection(db, 'quizzes'), 
+        where('courseId', '==', courseId),
+        where('lessonId', '==', lessonId || '')
+      );
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
-        setQuiz(snapshot.docs[0].data());
+        const data = snapshot.docs[0].data();
+        setQuiz({ id: snapshot.docs[0].id, ...data });
       } else {
         // Fallback for demo
         setQuiz({
           questions: [
-            { question: "What is the primary objective of this course?", options: ["Learning Arabic", "Modern Tech", "Both", "None"], correctAnswer: 2 },
-            { question: "Which direction is the Qibla?", options: ["North", "South", "Kaaba", "East"], correctAnswer: 2 },
-            { question: "How many prayers are obligatory?", options: ["3", "4", "5", "6"], correctAnswer: 2 }
+            { question: "What is the primary objective of this course?", options: ["Learning Arabic", "Modern Tech", "Both", "None"], correctAnswer: "2" },
+            { question: "Which direction is the Qibla?", options: ["North", "South", "Kaaba", "East"], correctAnswer: "2" },
+            { question: "How many prayers are obligatory?", options: ["3", "4", "5", "6"], correctAnswer: "2" }
           ],
           passingScore: 2
         });
@@ -58,22 +101,72 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
   };
 
   const handleNext = () => {
-    if (selectedOption === quiz.questions[currentQuestion].correctAnswer) {
-      setScore(score + 1);
+    const q = quiz.questions[currentQuestion];
+    let isCorrect = false;
+    let marksToAdd = 0;
+
+    if (q.type === 'mcq' || !q.type) {
+       // Check if selectedOption is numerical index or text
+       const selectedValue = selectedOption !== null && q.options ? q.options[selectedOption] : null;
+       
+       const isCorrectIndex = selectedOption !== null && String(selectedOption) === String(q.correctAnswer);
+       const isCorrectText = selectedValue !== null && String(selectedValue).trim().toLowerCase() === String(q.correctAnswer || '').trim().toLowerCase();
+       
+       if (isCorrectIndex || isCorrectText) {
+         isCorrect = true;
+         marksToAdd = q.marks || 1;
+       }
+       console.log(`Question ${currentQuestion}: Selected=${selectedOption} (${selectedValue}), Correct=${q.correctAnswer}. Result=${isCorrect}`);
+    } else if (q.type === 'written') {
+       if (writtenAnswer.trim().toLowerCase() === String(q.correctAnswer || '').trim().toLowerCase()) {
+         isCorrect = true;
+         marksToAdd = q.marks || 1;
+       }
     }
+
+    const newScore = score + marksToAdd;
+    setScore(newScore);
 
     if (currentQuestion < quiz.questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedOption(null);
+      setWrittenAnswer('');
     } else {
+      setFinalScore(newScore);
       setShowResult(true);
+      submitAssessment(newScore);
+      
+      console.log(`Quiz Finished. Final Score: ${newScore}, Threshold: ${passingThreshold}, Passed: ${newScore >= passingThreshold}`);
+      
+      // If it's a lesson quiz and they passed, call onSuccess to unlock progress early
+      if (lessonId && newScore >= passingThreshold) {
+        onSuccess();
+      }
     }
+  };
+
+  const submitAssessment = async (finalScoreValue: number) => {
+     // Save the submission
+     try {
+        await addDoc(collection(db, 'quiz_submissions'), {
+           userId,
+           userName,
+           courseId,
+           quizId: quiz.id || 'unknown',
+           score: finalScoreValue,
+           totalMarks: totalPossibleScore,
+           isPass: finalScoreValue >= passingThreshold,
+           submittedAt: serverTimestamp()
+        });
+     } catch (e) {
+        console.error("Submission error:", e);
+     }
   };
 
   const issueCertificate = async () => {
     setIsIssuing(true);
     try {
-      await addDoc(collection(db, 'certificates'), {
+      const docRef = await addDoc(collection(db, 'certificates'), {
         userId,
         userName,
         courseId,
@@ -81,16 +174,9 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
         issuedAt: serverTimestamp(),
       });
       setHasCertificate(true);
+      setIssuedCertId(docRef.id);
       onSuccess();
-      
-      // Auto-trigger print
-      setTimeout(() => {
-        const printContent = document.getElementById('certificate-print-area');
-        if (printContent) {
-          window.print();
-        }
-      }, 500);
-
+      setShowCertView(true);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'certificates');
     } finally {
@@ -102,39 +188,22 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 backdrop-blur-md bg-black/40">
-      {/* Printable Certificate Area (Hidden usually) */}
-      <div id="certificate-print-area" className="hidden print:block fixed inset-0 bg-white z-[200]">
-        <div className="max-w-[800px] mx-auto my-20 p-20 border-[20px] border-double border-blue-900 text-center font-serif bg-white shadow-2xl relative">
-          <div className="absolute top-10 right-10 opacity-10">
-            <Award size={150} className="text-blue-900" />
-          </div>
-          <p className="text-4xl text-blue-900 mb-10 font-bold uppercase tracking-[10px]">Certificate of Achievement</p>
-          <p className="text-xl mb-10 italic">This is to certify that</p>
-          <p className="text-6xl mb-12 font-bold text-black border-b-2 border-black inline-block px-10 pb-4">{userName}</p>
-          <p className="text-xl mb-10 italic">has successfully completed the course</p>
-          <p className="text-4xl mb-20 font-bold text-blue-800">{courseTitle}</p>
-          <div className="flex justify-between items-end mt-20">
-             <div className="text-left">
-               <p className="font-bold border-t-2 border-black pt-2 px-4">Authorized Signature</p>
-               <p className="text-sm text-gray-500">Ribat Academy Director</p>
-             </div>
-             <div className="w-32 h-32 opacity-20">
-               <CheckCircle size={100} className="text-blue-900" />
-             </div>
-             <div className="text-right">
-               <p className="font-bold border-t-2 border-black pt-2 px-4">Issue Date</p>
-               <p className="text-sm text-gray-500">{new Date().toLocaleDateString()}</p>
-             </div>
-          </div>
-          <div className="mt-20 text-[10px] text-gray-300 uppercase tracking-widest">Verification ID: {courseId.slice(0,8)}-{userId.slice(0,8)}</div>
+      {showCertView ? (
+        <div className="w-full h-full max-h-[90vh] overflow-y-auto">
+          <CertificateView 
+            userName={userName}
+            courseTitle={courseTitle}
+            issueDate={new Date().toLocaleDateString('en-GB')}
+            certificateId={`${courseId?.slice(0,8)}-${userId?.slice(0,8)}`}
+            onClose={() => setShowCertView(false)}
+          />
         </div>
-      </div>
-
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden relative"
-      >
+      ) : (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden relative"
+        >
         <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-black">
           <X size={24} />
         </button>
@@ -147,31 +216,43 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
             </div>
           ) : showResult ? (
             <div className="text-center">
-               {score >= quiz.passingScore ? (
+               {(finalScore ?? score) >= passingThreshold ? (
                  <>
                    <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Award size={40} />
                    </div>
                    <h3 className="text-3xl font-bold mb-4">Mabrouk! You Passed</h3>
-                   <p className="text-gray-500 mb-8">You scored {score}/{quiz.questions.length}. Alhamdulillah, you have completed the assessment successfully.</p>
+                   <p className="text-gray-500 mb-8">You scored {finalScore ?? score} out of {totalPossibleScore}. Alhamdulillah, you have completed the assessment successfully.</p>
                    
-                   {!hasCertificate && !isIssuing ? (
-                      <Button onClick={issueCertificate} fullWidth className="gap-2">
-                         <Award size={20} /> Claim Certificate & Print
-                      </Button>
-                   ) : isIssuing ? (
-                      <Button fullWidth disabled>
-                         <Loader2 className="animate-spin mr-2" /> Saving and Preparing Print...
-                      </Button>
+                   {lessonId ? (
+                     <Button onClick={onClose} fullWidth className="gap-2">
+                        Continue to Next Lesson <ArrowRight size={20} />
+                     </Button>
                    ) : (
-                      <div className="space-y-3">
-                         <Button onClick={() => window.print()} fullWidth className="bg-green-600 hover:bg-green-700 gap-2">
-                            <Award size={20} /> Re-print Certificate
-                         </Button>
-                         <Button variant="ghost" onClick={onClose} fullWidth>
-                            Finish Course
-                         </Button>
-                      </div>
+                     <>
+                        {!hasCertificate && !isIssuing ? (
+                           <Button onClick={issueCertificate} fullWidth className="gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 shadow-lg shadow-amber-200">
+                              <Award size={20} /> Claim My Certificate
+                           </Button>
+                        ) : isIssuing ? (
+                           <Button fullWidth disabled className="bg-gray-100 text-gray-400 border border-gray-200">
+                              <Loader2 className="animate-spin mr-2" size={18} /> Preparing View...
+                           </Button>
+                        ) : (
+                           <div className="space-y-3">
+                              <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl mb-4">
+                                 <p className="text-[10px] uppercase font-bold tracking-widest text-blue-500 mb-1">Status</p>
+                                 <p className="text-sm font-bold text-blue-900">Certificate Issued successfully!</p>
+                              </div>
+                              <Button onClick={() => setShowCertView(true)} fullWidth className="bg-[#0EA5E9] hover:bg-blue-700 gap-2 h-12">
+                                 <Award size={20} /> View & Download Certificate
+                              </Button>
+                              <Button variant="ghost" onClick={onClose} fullWidth className="h-12">
+                                 Finish Course
+                              </Button>
+                           </div>
+                        )}
+                     </>
                    )}
                  </>
                ) : (
@@ -180,8 +261,11 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
                       <AlertCircle size={40} />
                    </div>
                    <h3 className="text-3xl font-bold mb-4">Keep Practicing</h3>
-                   <p className="text-gray-500 mb-8">You scored {score}/{quiz.questions.length}. You need at least {quiz.passingScore} to pass. review the lessons and try again.</p>
-                   <Button onClick={() => { setShowResult(false); setCurrentQuestion(0); setScore(0); setSelectedOption(null); }} fullWidth>
+                   <p className="text-gray-500 mb-8">
+                     You scored {finalScore ?? score} out of {totalPossibleScore} ({Math.round(((finalScore ?? score) / totalPossibleScore) * 100)}%). 
+                     You need at least {quiz?.passingScore ?? quiz?.passMark ?? 70}% to pass. Review the lessons and try again.
+                   </p>
+                   <Button onClick={() => { setShowResult(false); setFinalScore(null); setCurrentQuestion(0); setScore(0); setSelectedOption(null); setWrittenAnswer(''); }} fullWidth>
                       Try Again
                    </Button>
                  </>
@@ -191,32 +275,41 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
             <>
               <div className="mb-8">
                 <span className="text-[10px] font-bold text-[#0EA5E9] bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Assessment</span>
-                <h3 className="text-2xl font-bold mt-4">{courseTitle} Final Quiz</h3>
+                <h3 className="text-2xl font-bold mt-4">{quiz.title || (lessonId ? 'Lesson Quiz' : `${courseTitle} Final Quiz`)}</h3>
                 <div className="mt-2 text-xs text-gray-400">Question {currentQuestion + 1} of {quiz.questions.length}</div>
               </div>
 
               <div className="space-y-6">
-                <p className="text-lg font-medium leading-relaxed">{quiz.questions[currentQuestion].question}</p>
+                <div className="text-lg font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: quiz.questions[currentQuestion].question }} />
                 <div className="space-y-3">
-                  {quiz.questions[currentQuestion].options.map((option: string, i: number) => (
-                    <button
-                      key={i}
-                      onClick={() => setSelectedOption(i)}
-                      className={cn(
-                        "w-full text-left p-5 rounded-2xl border-2 transition-all font-medium",
-                        selectedOption === i 
-                          ? "border-[#0EA5E9] bg-blue-50/50 text-[#0EA5E9]" 
-                          : "border-gray-100 hover:border-gray-200"
-                      )}
-                    >
-                      {option}
-                    </button>
-                  ))}
+                  {quiz.questions[currentQuestion].type === 'mcq' || !quiz.questions[currentQuestion].type ? (
+                    quiz.questions[currentQuestion].options.map((option: string, i: number) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedOption(i)}
+                        className={cn(
+                          "w-full text-left p-5 rounded-2xl border-2 transition-all font-medium",
+                          selectedOption === i 
+                            ? "border-[#0EA5E9] bg-blue-50/50 text-[#0EA5E9]" 
+                            : "border-gray-100 hover:border-gray-200"
+                        )}
+                      >
+                        {option}
+                      </button>
+                    ))
+                  ) : (
+                    <textarea 
+                      value={writtenAnswer}
+                      onChange={(e) => setWrittenAnswer(e.target.value)}
+                      placeholder="Write your answer here..."
+                      className="w-full min-h-[150px] p-5 rounded-2xl border-2 border-gray-100 focus:border-[#0EA5E9] outline-none font-medium resize-none transition-colors"
+                    />
+                  )}
                 </div>
                 <Button 
                   onClick={handleNext} 
                   fullWidth 
-                  disabled={selectedOption === null}
+                  disabled={quiz.questions[currentQuestion].type === 'written' ? writtenAnswer.trim() === '' : selectedOption === null}
                   className="gap-2"
                 >
                   {currentQuestion === quiz.questions.length - 1 ? 'Finish' : 'Next Question'}
@@ -227,6 +320,7 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
           )}
         </div>
       </motion.div>
+    )}
     </div>
   );
 }

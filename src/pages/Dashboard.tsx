@@ -5,9 +5,11 @@ import { collection, query, where, getDocs, onSnapshot, doc, getDoc, orderBy } f
 import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { Card } from '@/src/components/Card';
 import { Button } from '@/src/components/Button';
-import { LayoutDashboard, BookOpen, User, Settings, CreditCard, Loader2, Award, Download, ExternalLink, Bookmark, Bell, BellOff, Info, CheckCircle, Clock, Video } from 'lucide-react';
+import { LayoutDashboard, BookOpen, User, Settings, CreditCard, Loader2, Award, Download, ExternalLink, Bookmark, Bell, BellOff, Info, CheckCircle, Clock, Video, X } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { getDownloadUrl, getThumbnailUrl } from '@/src/lib/drive';
+
+import { CertificateView } from '@/src/components/CertificateView';
 
 function LiveCountdown({ startTime, meetingLink }: { startTime: string, meetingLink: string }) {
   const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
@@ -211,32 +213,21 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-      {/* Printable Certificate Area (Hidden usually) */}
+      {/* Certificate Viewer Overlay */}
       {printingCert && (
-        <div id="certificate-print-area" className="hidden print:block fixed inset-0 bg-white z-[200]">
-          <div className="max-w-[800px] mx-auto my-20 p-20 border-[20px] border-double border-blue-900 text-center font-serif bg-white shadow-2xl relative">
-            <div className="absolute top-10 right-10 opacity-10">
-              <Award size={150} className="text-blue-900" />
-            </div>
-            <p className="text-4xl text-blue-900 mb-10 font-bold uppercase tracking-[10px]">Certificate of Achievement</p>
-            <p className="text-xl mb-10 italic">This is to certify that</p>
-            <p className="text-6xl mb-12 font-bold text-black border-b-2 border-black inline-block px-10 pb-4">{printingCert.userName || userData?.name}</p>
-            <p className="text-xl mb-10 italic">has successfully completed the course</p>
-            <p className="text-4xl mb-20 font-bold text-blue-800">{printingCert.courseTitle}</p>
-            <div className="flex justify-between items-end mt-20 font-sans">
-              <div className="text-left">
-                <p className="font-bold border-t-2 border-black pt-2 px-4">Authorized Signature</p>
-                <p className="text-sm text-gray-500">Ribat Academy Director</p>
-              </div>
-              <div className="w-32 h-32 opacity-20">
-                <CheckCircle size={100} className="text-blue-900" />
-              </div>
-              <div className="text-right">
-                <p className="font-bold border-t-2 border-black pt-2 px-4">Issue Date</p>
-                <p className="text-sm text-gray-500">{printingCert.issuedAt?.toDate ? printingCert.issuedAt.toDate().toLocaleDateString() : new Date().toLocaleDateString()}</p>
-              </div>
-            </div>
+        <div className="fixed inset-0 z-[200] bg-white overflow-y-auto pt-20">
+          <div className="absolute top-6 right-6 z-[210]">
+             <Button variant="outline" onClick={() => setPrintingCert(null)} className="rounded-full w-12 h-12 p-0">
+               <X size={24} />
+             </Button>
           </div>
+          <CertificateView 
+            userName={printingCert.userName || userData?.name}
+            courseTitle={printingCert.courseTitle}
+            issueDate={printingCert.issuedAt?.toDate ? printingCert.issuedAt.toDate().toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
+            certificateId={`${printingCert.courseId?.slice(0,8)}-${user?.uid?.slice(0,8)}`}
+            onClose={() => setPrintingCert(null)}
+          />
         </div>
       )}
 
@@ -310,7 +301,7 @@ export function Dashboard() {
                       )}
                       {myCourses.filter(c => c.progress > 0 && c.progress < 100).map(course => (
                         <div key={course.id} className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl border border-gray-50 bg-gray-50/30">
-                           <img src={course.image} alt={course.title} className="w-full sm:w-32 aspect-video object-cover rounded-lg" />
+                           <img src={getThumbnailUrl(course.image)} alt={course.title} className="w-full sm:w-32 aspect-video object-cover rounded-lg" referrerPolicy="no-referrer" />
                            <div className="flex-grow w-full">
                               <h4 className="font-bold mb-2">{course.title}</h4>
                               <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
@@ -326,7 +317,7 @@ export function Dashboard() {
                       {/* Show the first course if nothing is in progress */}
                       {myCourses.filter(c => c.progress > 0 && c.progress < 100).length === 0 && myCourses.length > 0 && (
                          <div key={myCourses[0].id} className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl border border-gray-50 bg-gray-50/30">
-                            <img src={myCourses[0].image} alt={myCourses[0].title} className="w-full sm:w-32 aspect-video object-cover rounded-lg" />
+                            <img src={getThumbnailUrl(myCourses[0].image)} alt={myCourses[0].title} className="w-full sm:w-32 aspect-video object-cover rounded-lg" referrerPolicy="no-referrer" />
                             <div className="flex-grow w-full">
                                <h4 className="font-bold mb-2">{myCourses[0].title}</h4>
                                <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
@@ -601,14 +592,13 @@ export function Dashboard() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="gap-2"
+                              className="gap-2 border-blue-100 text-[#0EA5E9] hover:bg-blue-50"
                               onClick={() => {
                                 setPrintingCert(cert);
-                                setTimeout(() => window.print(), 100);
                               }}
                             >
-                              <Download size={14} />
-                              Print
+                              <Award size={14} />
+                              View & Download
                             </Button>
                           </div>
                         ))}

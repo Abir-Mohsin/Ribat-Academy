@@ -94,6 +94,21 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
 
       console.log("Submitting order with data:", orderData);
       await addDoc(collection(db, 'orders'), orderData);
+      
+      // Notify Admin
+      try {
+        fetch("https://formsubmit.co/ajax/abirmohsin02@gmail.com", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            Name: "System Notification",
+            Message: `New pending order for ${item.type}: ${item.title}.`,
+            UserEmail: user.email,
+            Amount: item.price,
+            TransactionID: isCod ? 'COD' : trxId
+          })
+        }).catch(() => {});
+      } catch (e) {}
 
       setSuccess(true);
     } catch (err: any) {
@@ -126,6 +141,22 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
         mobileNumber: item.bookType === 'hardcover' ? mobileNumber : null,
         createdAt: serverTimestamp(),
       });
+      
+      // Notify Admin
+      try {
+        fetch("https://formsubmit.co/ajax/abirmohsin02@gmail.com", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            Name: "System Notification",
+            Message: `New successful STRIPE payment for ${item.type}: ${item.title}.`,
+            UserEmail: user.email,
+            Amount: item.price,
+            TransactionID: 'Stripe Auto'
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
       setSuccess(true);
     } catch (error) {
       console.error("Error saving Stripe order:", error);
@@ -319,22 +350,24 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                     <p className="text-gray-500 text-sm">{method === 'cod' ? 'Confirm your order' : 'Follow instructions to pay manually.'}</p>
                   </header>
 
-                  <div className="bg-gray-50 p-4 rounded-2xl mb-8 border border-gray-100 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 p-2 opacity-10">
-                      <Smartphone size={60} />
+                  {method === 'manual' && (
+                    <div className="bg-gray-50 p-4 rounded-2xl mb-8 border border-gray-100 overflow-hidden relative">
+                      <div className="absolute top-0 right-0 p-2 opacity-10">
+                        <Smartphone size={60} />
+                      </div>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">BKash / Nagad</p>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100">
+                            <span className="text-sm font-medium">Personal Number</span>
+                            <span className="font-mono font-bold text-black">01788876206</span>
+                        </div>
+                        <div className="flex justify-between items-center text-blue-600 px-1">
+                            <span className="text-sm font-medium">Amount to send</span>
+                            <span className="font-bold text-xl">৳{item.price}</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">BKash / Nagad</p>
-                    <div className="space-y-4">
-                       <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100">
-                          <span className="text-sm font-medium">Personal Number</span>
-                          <span className="font-mono font-bold text-black">01788876206</span>
-                       </div>
-                       <div className="flex justify-between items-center text-blue-600 px-1">
-                          <span className="text-sm font-medium">Amount to send</span>
-                          <span className="font-bold text-xl">৳{item.price}</span>
-                       </div>
-                    </div>
-                  </div>
+                  )}
 
                   <form onSubmit={(e) => handleManualSubmit(e, method === 'cod')} className="space-y-6">
                     {error && (
