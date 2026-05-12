@@ -37,7 +37,7 @@ export function Home() {
 
   const heroImages = settings?.heroImages 
     ? settings.heroImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
-    : [settings?.heroImage || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"];
+    : [settings?.heroImage].filter(Boolean);
 
   const parseRatingImages = (raw?: string) => {
     if (!raw) return [];
@@ -104,14 +104,16 @@ export function Home() {
       {/* Hero Section */}
       <section className="relative pt-16 pb-24 lg:pt-32 lg:pb-40 px-4 bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary-light)] overflow-hidden">
         {/* Background Image Layer */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={getDownloadUrl(settings?.heroBackgroundImage || heroImages[0])} 
-            className="w-full h-full object-cover opacity-10" 
-            alt="Hero Background"
-            referrerPolicy="no-referrer"
-          />
-        </div>
+        {(settings?.heroBackgroundImage || (heroImages.length > 0 && heroImages[0])) && (
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={getDownloadUrl(settings?.heroBackgroundImage || heroImages[0]) || undefined} 
+              className="w-full h-full object-cover opacity-10" 
+              alt="Hero Background"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
           <motion.div
@@ -193,26 +195,34 @@ export function Home() {
                   src={settings.heroVideoUrl} 
                 />
               ) : (
-                <div className="relative w-full h-full overflow-hidden">
-                  <AnimatePresence initial={false}>
-                    <motion.img 
-                      key={currentHeroImage}
-                      src={getDownloadUrl(heroImages[currentHeroImage])} 
-                      alt={`Hero slide ${currentHeroImage + 1}`} 
-                      initial={{ x: '100%', opacity: 1 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: '-100%', opacity: 1 }}
-                      transition={{ 
-                        x: { type: "spring", stiffness: 300, damping: 30 },
-                        opacity: { duration: 0.2 }
-                      }}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback if image fails to load
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80";
-                      }}
-                    />
-                  </AnimatePresence>
+                <div className="relative w-full h-full overflow-hidden bg-black/5 rounded-2xl md:rounded-[2rem]">
+                  {heroImages.length > 0 ? (
+                    <AnimatePresence initial={false}>
+                      <motion.img 
+                        key={currentHeroImage}
+                        src={getDownloadUrl(heroImages[currentHeroImage]) || undefined} 
+                        alt={`Hero slide ${currentHeroImage + 1}`} 
+                        initial={{ x: '100%', opacity: 1 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: '-100%', opacity: 1 }}
+                        transition={{ 
+                          x: { type: "spring", stiffness: 300, damping: 30 },
+                          opacity: { duration: 0.2 }
+                        }}
+                        className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-[2rem]"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (!target.src.includes("unsplash")) {
+                            target.src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80";
+                          }
+                        }}
+                      />
+                    </AnimatePresence>
+                  ) : (
+                    <div className="w-full h-full bg-black/5 rounded-2xl md:rounded-[2rem] flex items-center justify-center">
+                       <GraduationCap className="w-24 h-24 text-black/20" />
+                    </div>
+                  )}
 
                   {heroImages.length > 1 && (
                     <>
