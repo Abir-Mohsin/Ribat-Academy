@@ -180,9 +180,9 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
+            className="relative bg-white w-full max-w-md rounded-3xl overflow-y-auto max-h-[90vh] shadow-2xl"
           >
-            <div className="p-8">
+            <div className="p-6 md:p-8">
               <button 
                 onClick={onClose}
                 className="absolute top-6 right-6 text-gray-400 hover:text-black transition-colors"

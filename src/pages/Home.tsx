@@ -139,7 +139,7 @@ export function Home() {
                 </Button>
               </Link>
               <Link to="/courses?type=live">
-                <Button variant="outline" size="lg" className="gap-2 border-white text-white hover:bg-white hover:text-[var(--color-primary-dark)]">
+                <Button size="lg" className="gap-2 border-white/20 bg-white/5 backdrop-blur-md text-white hover:bg-white hover:text-black hover:border-white transition-all duration-500 shadow-2xl shadow-black/10">
                   <Video size={20} />
                   Live Classes
                 </Button>
@@ -258,10 +258,10 @@ export function Home() {
       </section>
 
       {/* Academy Features */}
-      <section className="py-24 bg-white px-4">
+      <section className="py-24 bg-white px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {homeFeatures && homeFeatures.length > 0 ? (
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-8">
               {homeFeatures.map(feature => {
                 const IconComponent = (Icons as any)[feature.icon] || Icons.Star;
                 const colors: any = {
@@ -274,41 +274,40 @@ export function Home() {
                 const c = colors[feature.colorClass] || colors.blue;
                 
                 return (
-                  <div key={feature.id} className={`w-[calc(33.333%-0.75rem)] md:w-[calc(33.333%-2rem)] p-4 md:p-10 ${c.bg} rounded-2xl md:rounded-[40px] border ${c.border} group hover:shadow-2xl ${c.hover} transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left`}>
-                    <div className={`w-10 h-10 md:w-14 md:h-14 ${c.iconBg} rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-black/5 group-hover:scale-110 transition-transform`}>
-                      <IconComponent className="text-white w-5 h-5 md:w-7 md:h-7" />
+                  <div key={feature.id} className={`w-[calc(33.333%-12px)] md:w-[calc(33.333%-32px)] p-3 md:p-10 ${c.bg} rounded-2xl md:rounded-[40px] border ${c.border} group hover:shadow-2xl ${c.hover} transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left`}>
+                    <div className={`w-8 h-8 md:w-14 md:h-14 ${c.iconBg} rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-8 shadow-lg shadow-black/5 group-hover:scale-110 transition-transform shrink-0`}>
+                      <IconComponent className="text-white w-4 h-4 md:w-7 md:h-7" />
                     </div>
-                    <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight md:leading-tight">{feature.title}</h3>
-                    <p className="text-gray-600 text-[10px] md:text-base leading-relaxed md:line-clamp-none break-words" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                    <h3 className="text-[11px] md:text-2xl font-bold mb-1 md:mb-4 tracking-tight md:leading-tight leading-none break-words">{feature.title}</h3>
+                    <p className="hidden md:block text-gray-600 text-sm md:text-base leading-relaxed break-words w-full" dangerouslySetInnerHTML={{ __html: feature.description }} />
                   </div>
                 );
               })}
             </div>
           ) : (
-             <div className="grid grid-cols-3 gap-4 md:gap-8">
-              <div className="p-4 md:p-10 bg-blue-50 rounded-2xl md:rounded-[40px] border border-blue-100 group hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-[#0EA5E9] rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
-                  <GraduationCap className="text-white w-5 h-5 md:w-7 md:h-7" />
+             <div className="flex flex-wrap justify-center gap-3 md:gap-8">
+              <div className="w-[calc(33.333%-12px)] md:w-[calc(33.333%-32px)] p-3 md:p-10 bg-blue-50 rounded-2xl md:rounded-[40px] border border-blue-100 group hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-8 h-8 md:w-14 h-14 bg-[#0EA5E9] rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-8 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform shrink-0">
+                  <GraduationCap className="text-white w-4 h-4 md:w-7 h-7" />
                 </div>
-                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Learning</h3>
-                <p className="hidden md:block text-gray-600 leading-relaxed">Our curriculum is designed by education experts to take you from basics to mastery.</p>
+                <h3 className="text-[11px] md:text-2xl font-bold mb-1 md:mb-4 tracking-tight leading-none break-words">Learning</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed text-sm md:text-base">Our curriculum is designed by education experts to take you from basics to mastery.</p>
               </div>
               
-              <div className="p-4 md:p-10 bg-green-50 rounded-2xl md:rounded-[40px] border border-green-100 group hover:shadow-2xl hover:shadow-green-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-green-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
-                  <Video className="text-white w-5 h-5 md:w-7 md:h-7" />
+              <div className="w-[calc(33.333%-12px)] md:w-[calc(33.333%-32px)] p-3 md:p-10 bg-green-50 rounded-2xl md:rounded-[40px] border border-green-100 group hover:shadow-2xl hover:shadow-green-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-8 h-8 md:w-14 h-14 bg-green-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-8 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform shrink-0">
+                  <Video className="text-white w-4 h-4 md:w-7 h-7" />
                 </div>
-                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Live Classes</h3>
-                <p className="hidden md:block text-gray-600 leading-relaxed">Interact with qualified instructors daily. Get your questions answered instantly.</p>
+                <h3 className="text-[11px] md:text-2xl font-bold mb-1 md:mb-4 tracking-tight leading-none break-words">Live Classes</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed text-sm md:text-base">Interact with qualified instructors daily. Get your questions answered instantly.</p>
               </div>
 
-
-               <div className="p-4 md:p-10 bg-amber-50 rounded-2xl md:rounded-[40px] border border-amber-100 group hover:shadow-2xl hover:shadow-amber-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-amber-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-8 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                  <BookOpen className="text-white w-5 h-5 md:w-7 md:h-7" />
+               <div className="w-[calc(33.333%-12px)] md:w-[calc(33.333%-32px)] p-3 md:p-10 bg-amber-50 rounded-2xl md:rounded-[40px] border border-amber-100 group hover:shadow-2xl hover:shadow-amber-200/50 transition-all duration-500 flex flex-col items-center text-center md:items-start md:text-left">
+                <div className="w-8 h-8 md:w-14 h-14 bg-amber-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-8 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform shrink-0">
+                  <BookOpen className="text-white w-4 h-4 md:w-7 h-7" />
                 </div>
-                <h3 className="text-sm md:text-2xl font-bold mb-2 md:mb-4 tracking-tight">Resources</h3>
-                <p className="hidden md:block text-gray-600 leading-relaxed">Access hundreds of PDF books, quizzes, and recorded lectures anytime.</p>
+                <h3 className="text-[11px] md:text-2xl font-bold mb-1 md:mb-4 tracking-tight leading-none break-words">Resources</h3>
+                <p className="hidden md:block text-gray-600 leading-relaxed text-sm md:text-base">Access hundreds of PDF books, quizzes, and recorded lectures anytime.</p>
               </div>
             </div>
           )}

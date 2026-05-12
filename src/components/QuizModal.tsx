@@ -200,98 +200,106 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
         </div>
       ) : (
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden relative"
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden relative border border-gray-100"
         >
-        <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-black">
+        <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-black hover:scale-110 transition-transform">
           <X size={24} />
         </button>
 
-        <div className="p-10 text-sans">
+        <div className="p-8 md:p-12 text-sans">
           {loading ? (
             <div className="py-20 text-center">
-              <Loader2 className="animate-spin mx-auto text-[#0EA5E9]" size={40} />
-              <p className="mt-4 font-bold text-gray-500">Preparing Quiz...</p>
+              <div className="w-16 h-16 border-4 border-gray-100 border-t-black rounded-full animate-spin mx-auto mb-6" />
+              <p className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Preparing Assessment...</p>
             </div>
           ) : showResult ? (
-            <div className="text-center">
+            <div className="text-center animate-in zoom-in-95 duration-500">
                {(finalScore ?? score) >= passingThreshold ? (
                  <>
-                   <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Award size={40} />
+                   <div className="w-24 h-24 bg-green-50 text-green-600 rounded-[32px] border border-green-100 flex items-center justify-center mx-auto mb-8 shadow-xl shadow-green-200/20">
+                      <Award size={48} strokeWidth={1.5} />
                    </div>
-                   <h3 className="text-3xl font-bold mb-4">Mabrouk! You Passed</h3>
-                   <p className="text-gray-500 mb-8">You scored {finalScore ?? score} out of {totalPossibleScore}. Alhamdulillah, you have completed the assessment successfully.</p>
+                   <h3 className="text-4xl font-black mb-4 tracking-tight">Mabrouk!</h3>
+                   <p className="text-gray-500 mb-10 leading-relaxed">
+                     Alhamdulillah, you have passed with a score of <span className="font-bold text-black">{finalScore ?? score}/{totalPossibleScore}</span>.
+                   </p>
                    
                    {lessonId ? (
-                     <Button onClick={onClose} fullWidth className="gap-2">
-                        Continue to Next Lesson <ArrowRight size={20} />
+                     <Button onClick={onClose} fullWidth size="lg" className="gap-2">
+                        Next Lesson <ArrowRight size={20} />
                      </Button>
                    ) : (
-                     <>
+                     <div className="space-y-4">
                         {!hasCertificate && !isIssuing ? (
-                           <Button onClick={issueCertificate} fullWidth className="gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 shadow-lg shadow-amber-200">
-                              <Award size={20} /> Claim My Certificate
+                           <Button onClick={issueCertificate} fullWidth size="lg" className="gap-2 bg-gradient-to-br from-amber-500 to-yellow-600 border-none shadow-xl shadow-amber-200">
+                              <Award size={20} /> Claim Certificate
                            </Button>
                         ) : isIssuing ? (
-                           <Button fullWidth disabled className="bg-gray-100 text-gray-400 border border-gray-200">
-                              <Loader2 className="animate-spin mr-2" size={18} /> Preparing View...
+                           <Button fullWidth size="lg" disabled className="bg-gray-100 text-gray-400">
+                              <Loader2 className="animate-spin mr-2" size={18} /> Preparing...
                            </Button>
                         ) : (
-                           <div className="space-y-3">
-                              <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl mb-4">
-                                 <p className="text-[10px] uppercase font-bold tracking-widest text-blue-500 mb-1">Status</p>
-                                 <p className="text-sm font-bold text-blue-900">Certificate Issued successfully!</p>
+                           <div className="space-y-4">
+                              <div className="p-6 bg-blue-50/50 border border-blue-100 rounded-3xl">
+                                 <p className="text-[10px] uppercase font-bold tracking-[2px] text-blue-500 mb-1">Status</p>
+                                 <p className="font-bold text-blue-900">Certificate successfully issued!</p>
                               </div>
-                              <Button onClick={() => setShowCertView(true)} fullWidth className="bg-[#0EA5E9] hover:bg-blue-700 gap-2 h-12">
-                                 <Award size={20} /> View & Download Certificate
+                              <Button onClick={() => setShowCertView(true)} fullWidth size="lg" className="gap-2">
+                                 <Award size={20} /> View Certificate
                               </Button>
-                              <Button variant="ghost" onClick={onClose} fullWidth className="h-12">
-                                 Finish Course
+                              <Button variant="ghost" onClick={onClose} fullWidth>
+                                 Close Portal
                               </Button>
                            </div>
                         )}
-                     </>
+                     </div>
                    )}
                  </>
                ) : (
                  <>
-                   <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <AlertCircle size={40} />
+                   <div className="w-24 h-24 bg-red-50 text-red-600 rounded-[32px] border border-red-100 flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-200/20">
+                      <AlertCircle size={48} strokeWidth={1.5} />
                    </div>
-                   <h3 className="text-3xl font-bold mb-4">Keep Practicing</h3>
-                   <p className="text-gray-500 mb-8">
-                     You scored {finalScore ?? score} out of {totalPossibleScore} ({Math.round(((finalScore ?? score) / totalPossibleScore) * 100)}%). 
-                     You need at least {quiz?.passingScore ?? quiz?.passMark ?? 70}% to pass. Review the lessons and try again.
+                   <h3 className="text-3xl font-black mb-4 tracking-tight">Try Again</h3>
+                   <p className="text-gray-500 mb-10 leading-relaxed">
+                     You scored {finalScore ?? score} out of {totalPossibleScore}. 
+                     Mastery requires {quiz?.passingScore ?? quiz?.passMark ?? 70}% correct answers.
                    </p>
-                   <Button onClick={() => { setShowResult(false); setFinalScore(null); setCurrentQuestion(0); setScore(0); setSelectedOption(null); setWrittenAnswer(''); }} fullWidth>
-                      Try Again
+                   <Button onClick={() => { setShowResult(false); setFinalScore(null); setCurrentQuestion(0); setScore(0); setSelectedOption(null); setWrittenAnswer(''); }} fullWidth size="lg">
+                      Restart Quiz
                    </Button>
                  </>
                )}
             </div>
           ) : (
             <>
-              <div className="mb-8">
-                <span className="text-[10px] font-bold text-[#0EA5E9] bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Assessment</span>
-                <h3 className="text-2xl font-bold mt-4">{quiz.title || (lessonId ? 'Lesson Quiz' : `${courseTitle} Final Quiz`)}</h3>
-                <div className="mt-2 text-xs text-gray-400">Question {currentQuestion + 1} of {quiz.questions.length}</div>
+              <div className="mb-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] font-black text-[#0EA5E9] bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 uppercase tracking-widest leading-none">
+                    Assessment
+                  </span>
+                  <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 uppercase tracking-widest leading-none">
+                    Q {currentQuestion + 1} / {quiz.questions.length}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-black tracking-tight leading-tight">{quiz.title || (lessonId ? 'Progress Check' : `Final Evaluation`)}</h3>
               </div>
 
-              <div className="space-y-6">
-                <div className="text-lg font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: quiz.questions[currentQuestion].question }} />
-                <div className="space-y-3">
+              <div className="space-y-8">
+                <div className="text-lg font-bold leading-relaxed text-black/80" dangerouslySetInnerHTML={{ __html: quiz.questions[currentQuestion].question }} />
+                <div className="space-y-4">
                   {quiz.questions[currentQuestion].type === 'mcq' || !quiz.questions[currentQuestion].type ? (
                     quiz.questions[currentQuestion].options.map((option: string, i: number) => (
                       <button
                         key={i}
                         onClick={() => setSelectedOption(i)}
                         className={cn(
-                          "w-full text-left p-5 rounded-2xl border-2 transition-all font-medium",
+                          "w-full text-left p-6 rounded-2xl border-2 transition-all duration-300 font-bold text-sm transform active:scale-[0.98]",
                           selectedOption === i 
-                            ? "border-[#0EA5E9] bg-blue-50/50 text-[#0EA5E9]" 
-                            : "border-gray-100 hover:border-gray-200"
+                            ? "border-black bg-black text-white shadow-xl shadow-black/10" 
+                            : "border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200"
                         )}
                       >
                         {option}
@@ -301,19 +309,20 @@ export function QuizModal({ isOpen, onClose, courseId, courseTitle, userId, user
                     <textarea 
                       value={writtenAnswer}
                       onChange={(e) => setWrittenAnswer(e.target.value)}
-                      placeholder="Write your answer here..."
-                      className="w-full min-h-[150px] p-5 rounded-2xl border-2 border-gray-100 focus:border-[#0EA5E9] outline-none font-medium resize-none transition-colors"
+                      placeholder="Share your detailed answer..."
+                      className="w-full min-h-[160px] p-6 rounded-2xl border-2 border-gray-100 focus:border-black focus:bg-white bg-gray-50/50 outline-none font-bold text-sm resize-none transition-all"
                     />
                   )}
                 </div>
                 <Button 
                   onClick={handleNext} 
                   fullWidth 
+                  size="lg"
                   disabled={quiz.questions[currentQuestion].type === 'written' ? writtenAnswer.trim() === '' : selectedOption === null}
-                  className="gap-2"
+                  className="gap-3 shadow-xl shadow-black/10"
                 >
-                  {currentQuestion === quiz.questions.length - 1 ? 'Finish' : 'Next Question'}
-                  <ArrowRight size={20} />
+                  {currentQuestion === quiz.questions.length - 1 ? 'SUBMIT TEST' : 'NEXT STEP'}
+                  <ArrowRight size={18} />
                 </Button>
               </div>
             </>

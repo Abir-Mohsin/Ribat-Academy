@@ -22,121 +22,150 @@ export function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-[var(--color-primary-dark)] text-[#ffffff] border-b border-[var(--color-primary-light)]">
-      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-[#002D34]/95 backdrop-blur-xl border-b border-white/5 font-sans">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-            <GraduationCap className="text-[var(--color-primary-dark)] w-6 h-6" />
+        <Link to="/" className="flex items-center gap-3 group transition-transform active:scale-95">
+          <div className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-white/10 group-hover:rotate-6 transition-transform duration-500">
+            <GraduationCap className="text-[#002D34] w-6 h-6" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-white">Ribat Academy</span>
+          <div className="flex flex-col">
+            <span className="font-black text-lg tracking-tight text-white leading-none">Ribat</span>
+            <span className="text-[10px] font-black text-white/40 uppercase tracking-[3px] leading-none mt-1">Academy</span>
+          </div>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-gray-300",
-                isActive(link.href) ? "text-white" : "text-gray-300"
-              )}
-            >
-              {link.name}
-            </Link>
-          ))}
+        <div className="hidden md:flex items-center gap-10">
+          <div className="flex items-center gap-8 pr-8 border-r border-white/10">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className={cn(
+                  "text-xs font-black uppercase tracking-[2px] transition-all duration-300 hover:text-white",
+                  isActive(link.href) ? "text-white" : "text-white/40"
+                )}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
 
           {user ? (
-            <div className="flex items-center gap-4 pl-4 border-l border-gray-200">
+            <div className="flex items-center gap-6">
               <NotificationCenter />
-              <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-80">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">
+              <Link to="/dashboard" className="flex items-center gap-3 p-1 pr-4 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all group">
+                <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-black text-sm uppercase group-hover:scale-105 transition-transform">
                   {userData?.name?.[0] || user.email?.[0].toUpperCase()}
                 </div>
-                <span className="text-sm font-medium">{userData?.name || 'Dashboard'}</span>
+                <span className="text-xs font-black uppercase tracking-widest text-white/80">{userData?.name?.split(' ')[0] || 'Dashboard'}</span>
               </Link>
               <button 
                 onClick={() => signOut()}
-                className="text-gray-400 hover:text-red-500 transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-xl shadow-red-500/10"
                 title="Sign Out"
               >
                 <LogOut size={18} />
               </button>
             </div>
           ) : (
-            <Button onClick={signInWithGoogle} size="sm">Get Started</Button>
+            <Button onClick={signInWithGoogle} size="sm" className="px-8 rounded-full font-black text-[10px] tracking-widest">ENROLL NOW</Button>
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden p-2 text-white"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Toggle & Icons */}
+        <div className="md:hidden flex items-center gap-4">
+          {user && <NotificationCenter />}
+          <button
+            className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white active:scale-90 transition-transform"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[var(--color-primary-dark)] border-b border-[var(--color-primary-light)] overflow-hidden"
-          >
-            <div className="px-4 py-6 space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    "block text-lg font-medium",
-                    isActive(link.href) ? "text-white" : "text-gray-300"
-                  )}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-gray-100">
-                {user ? (
-                  <div className="space-y-4">
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 top-20 bg-black/60 backdrop-blur-sm z-[45]"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="absolute top-20 left-0 right-0 z-50 p-4"
+            >
+              <div className="bg-white rounded-[32px] shadow-2xl p-8 border border-gray-100 font-sans">
+                <div className="space-y-6">
+                  {navLinks.map((link) => (
                     <Link
-                      to="/dashboard"
+                      key={link.name}
+                      to={link.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 text-lg font-medium text-white"
+                      className={cn(
+                        "block text-2xl font-black tracking-tight transition-colors",
+                        isActive(link.href) ? "text-black" : "text-gray-300 hover:text-black"
+                      )}
                     >
-                      <User size={20} />
-                      Dashboard
+                      {link.name}
                     </Link>
-                    <button
-                      onClick={() => {
-                        signOut();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-lg font-medium text-red-500"
-                    >
-                      <LogOut size={20} />
-                      Sign Out
-                    </button>
+                  ))}
+                  <div className="pt-8 border-t border-gray-100 space-y-4">
+                    {user ? (
+                      <>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl group active:scale-95 transition-transform"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-black">
+                               {userData?.name?.[0] || user.email?.[0].toUpperCase()}
+                            </div>
+                            <div>
+                               <p className="font-black text-black">Member Profile</p>
+                               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Manage Account</p>
+                            </div>
+                          </div>
+                          <User className="text-gray-300 group-hover:text-black transition-colors" size={24} />
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            signOut();
+                            setIsOpen(false);
+                          }}
+                          className="w-full h-16 rounded-[24px] text-red-500 font-black tracking-widest border border-red-50 shadow-sm"
+                        >
+                          SIGN OUT
+                        </Button>
+                      </>
+                    ) : (
+                      <Button 
+                        onClick={() => {
+                          signInWithGoogle();
+                          setIsOpen(false);
+                        }} 
+                        fullWidth
+                        size="lg"
+                        className="h-16 rounded-[24px] font-black tracking-widest shadow-2xl shadow-black/10"
+                      >
+                        ACCESS PORTAL
+                      </Button>
+                    )}
                   </div>
-                ) : (
-                  <Button 
-                    onClick={() => {
-                      signInWithGoogle();
-                      setIsOpen(false);
-                    }} 
-                    fullWidth
-                  >
-                    Login / Sign Up
-                  </Button>
-                )}
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>

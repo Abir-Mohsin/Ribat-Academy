@@ -224,92 +224,104 @@ export function CoursePlayer() {
       <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row h-full">
         {/* Main Player Area */}
         <div className="flex-grow bg-black flex flex-col">
-          <div className="sticky top-0 z-20 bg-black/50 backdrop-blur-md p-4 flex items-center gap-4 text-white border-b border-white/10">
-             <Link to="/dashboard" className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <ChevronLeft />
-             </Link>
-             <div>
-                <h1 className="font-bold text-sm lg:text-base line-clamp-1">{course.title}</h1>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-sans font-bold">Lesson {activeLesson + 1}: {course.lessons[activeLesson].title}</p>
+          <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-xl p-6 flex items-center justify-between text-white border-b border-white/5">
+             <div className="flex items-center gap-6">
+                <Link to="/dashboard" className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-2xl transition-all border border-white/10">
+                   <ChevronLeft size={20} />
+                </Link>
+                <div>
+                   <h1 className="font-bold text-sm lg:text-lg line-clamp-1 tracking-tight">{course.title}</h1>
+                   <p className="text-[10px] text-white/40 uppercase font-black tracking-[2px]">Lesson {activeLesson + 1} of {course.lessons.length}</p>
+                </div>
+             </div>
+             <div className="hidden md:flex items-center gap-1.5 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Stream Ready</span>
              </div>
           </div>
           
-          <div className="aspect-video w-full bg-black relative group">
-             {(course.lessons[activeLesson].videoId || course.lessons[activeLesson].videoUrl) ? (
-               <iframe
-                 src={`https://www.youtube.com/embed/${getYouTubeId(course.lessons[activeLesson].videoId || course.lessons[activeLesson].videoUrl)}?autoplay=0&rel=0`}
-                 className="w-full h-full border-0"
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                 allowFullScreen
-                 title={course.lessons[activeLesson].title}
-               />
-             ) : (
-               <div className="w-full h-full flex flex-col items-center justify-center text-white/50 space-y-4">
-                 <PlayCircle size={64} className="opacity-20" />
-                 <p className="font-bold text-sm">No video source provided for this lesson.</p>
+          <div className="w-full bg-black relative group p-4 lg:p-8">
+             <div className="aspect-video w-full rounded-[32px] overflow-hidden shadow-2xl border border-white/5 bg-gray-900 relative">
+               {(course.lessons[activeLesson].videoId || course.lessons[activeLesson].videoUrl) ? (
+                 <iframe
+                   src={`https://www.youtube.com/embed/${getYouTubeId(course.lessons[activeLesson].videoId || course.lessons[activeLesson].videoUrl)}?autoplay=0&rel=0`}
+                   className="w-full h-full border-0"
+                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                   allowFullScreen
+                   title={course.lessons[activeLesson].title}
+                 />
+               ) : (
+                 <div className="w-full h-full flex flex-col items-center justify-center text-white/20 space-y-4">
+                   <PlayCircle size={80} strokeWidth={1} className="opacity-10" />
+                   <p className="font-bold text-sm uppercase tracking-widest">Video Stream Unavailable</p>
+                 </div>
+               )}
+               
+               <div className="absolute top-6 right-6 z-10">
+                  {!isCurrentLessonCompleted ? (
+                     <Button 
+                      variant="success" 
+                      onClick={handleMarkAsCompleted} 
+                      disabled={updating}
+                      className="shadow-2xl shadow-green-500/40 border-none px-8 rounded-full"
+                     >
+                        {updating ? <Loader2 className="animate-spin mr-2" size={18} /> : <CheckCircle className="mr-2" size={18} />}
+                        COMPLETE LESSON
+                     </Button>
+                  ) : (
+                     <div className="px-6 py-3 bg-white/90 backdrop-blur-md text-black rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl border border-white">
+                       <CheckCircle size={16} className="text-green-500" />
+                       Achievement Unlocked
+                     </div>
+                  )}
                </div>
-             )}
-             
-             <div className="absolute top-4 right-4 z-10 flex gap-2">
-                {!isCurrentLessonCompleted ? (
-                   <Button 
-                    variant="success" 
-                    size="sm"
-                    onClick={handleMarkAsCompleted} 
-                    disabled={updating}
-                    className="shadow-lg shadow-green-500/20"
-                   >
-                      {updating ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle className="mr-2" size={16} />}
-                      Mark Completed
-                   </Button>
-                ) : (
-                   <div className="px-4 py-2 bg-green-500/90 backdrop-blur-sm text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg border border-green-400/50">
-                     <CheckCircle size={14} />
-                     Lesson Completed
-                   </div>
-                )}
              </div>
           </div>
 
-          <div className="p-6 lg:p-10 bg-white border-b border-gray-100">
-             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="p-8 lg:p-12 bg-white">
+             <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-10 pb-10 border-b border-gray-50">
                <div>
-                  <h2 className="text-2xl font-bold mb-2">{course.lessons[activeLesson].title}</h2>
-                  <p className="text-gray-500 text-sm">Lesson {activeLesson + 1} of {course.lessons.length}</p>
+                  <h2 className="text-3xl font-black mb-3 tracking-tight">{course.lessons[activeLesson].title}</h2>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100">
+                      <Video size={14} className="text-blue-500" />
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{course.lessons[activeLesson].duration}</span>
+                    </div>
+                    <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Module Progress: {Math.round(((activeLesson+1)/course.lessons.length)*100)}%</div>
+                  </div>
                </div>
                <Button 
                 variant="outline" 
-                size="sm" 
                 onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-2 w-fit"
+                className="flex items-center gap-3 rounded-2xl border-gray-100 py-4 px-6 hover:bg-gray-50"
                >
-                 <Info size={16} />
-                 {showDetails ? 'Hide Course Details' : 'Show Course Details'}
+                 <Info size={18} className="text-black" />
+                 <span className="text-xs font-black uppercase tracking-widest">{showDetails ? 'LESSON CONTEXT' : 'LESSON CONTEXT'}</span>
                  <motion.div
                    animate={{ rotate: showDetails ? 180 : 0 }}
-                   transition={{ duration: 0.2 }}
+                   transition={{ duration: 0.3 }}
                  >
-                   <ChevronDown size={14} />
+                   <ChevronDown size={16} />
                  </motion.div>
                </Button>
              </div>
 
              <div className="max-w-4xl">
-                <div className="text-gray-600 leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: course.lessons[activeLesson].description || 'This lesson covers the fundamental building blocks of the language. Focus on the articulation points (Makharij) and the short vowels (Harakat).' }} />
+                <div className="text-gray-500 text-lg leading-relaxed mb-12 font-medium" dangerouslySetInnerHTML={{ __html: course.lessons[activeLesson].description || 'This module provides deep insights into the subject matter. Focus on the core principles discussed in this session.' }} />
 
                 {isCurrentLessonCompleted && currentLessonQuiz && !isQuizPassed && (
-                   <div className="mb-8 p-6 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
-                            <Target size={24} />
+                   <div className="mb-12 p-8 bg-black text-white rounded-[40px] shadow-2xl shadow-black/20 flex flex-col md:flex-row items-center justify-between gap-8 group">
+                      <div className="flex items-center gap-6">
+                         <div className="w-16 h-16 bg-white/10 text-white rounded-[24px] flex items-center justify-center shrink-0 border border-white/10 group-hover:scale-110 transition-transform">
+                            <Target size={32} />
                          </div>
                          <div>
-                            <h4 className="font-bold text-blue-900">Assessment Required</h4>
-                            <p className="text-sm text-blue-600">Please complete the quiz for this lesson to proceed.</p>
+                            <h4 className="font-black text-xl tracking-tight mb-1">Knowledge Verfication</h4>
+                            <p className="text-sm text-white/50">Complete the assessment to unlock the next chapter.</p>
                          </div>
                       </div>
-                      <Button onClick={() => { setQuizLessonId(currentLesson.id); setIsQuizOpen(true); }} className="whitespace-nowrap">
-                         Take Lesson Quiz
+                      <Button onClick={() => { setQuizLessonId(currentLesson.id); setIsQuizOpen(true); }} className="bg-white text-black hover:bg-gray-100 rounded-2xl h-16 px-10 font-black">
+                         TAKE QUIZ NOW
                       </Button>
                    </div>
                 )}
@@ -378,20 +390,25 @@ export function CoursePlayer() {
         </div>
 
         {/* Sidebar Lesson List */}
-        <aside className="w-full lg:w-[400px] bg-gray-50 border-l border-gray-100 flex flex-col h-screen overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-white flex items-center justify-between">
-             <h3 className="font-bold flex items-center gap-2">
-                <List size={20} />
-                Course Content
+        <aside className="w-full lg:w-[440px] bg-gray-50/50 border-l border-gray-100 flex flex-col lg:h-screen shrink-0 font-sans">
+          <div className="p-8 border-b border-gray-100 bg-white sticky top-0 z-10 flex items-center justify-between">
+             <h3 className="font-black text-xl tracking-tight flex items-center gap-3">
+                <List size={22} className="text-gray-400" />
+                Syllabus
              </h3>
-             <span className={cn(
-               "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase",
-               currentProgress === 100 ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
-             )}>
-               {loadingProgress ? "..." : `${currentProgress}% Done`}
-             </span>
+             <div className="flex flex-col items-end">
+               <span className="text-[10px] font-black uppercase tracking-[2px] text-gray-300 mb-1">Overall</span>
+               <span className={cn(
+                 "text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest border shadow-sm",
+                 currentProgress === 100 
+                   ? "bg-green-50 text-green-600 border-green-100" 
+                   : "bg-black text-white border-black"
+               )}>
+                 {loadingProgress ? "CALCULATING..." : `${currentProgress}%`}
+               </span>
+             </div>
           </div>
-          <div className="flex-grow overflow-y-auto">
+          <div className="flex-grow overflow-y-auto no-scrollbar space-y-1 p-2">
              {course.lessons.map((lesson, index) => {
                 const isCompleted = completedLessons.includes(lesson.id);
                 const hasQuiz = availableQuizzes.some(q => q.lessonId === lesson.id);
@@ -408,62 +425,76 @@ export function CoursePlayer() {
                        }
                     }}
                     className={cn(
-                      "w-full text-left p-6 transition-all border-b border-gray-100 flex gap-4 disabled:opacity-50 disabled:cursor-not-allowed",
-                      activeLesson === index ? "bg-white shadow-sm border-l-4 border-l-[#0EA5E9]" : "hover:bg-gray-100"
+                      "w-full text-left p-6 rounded-[24px] border transition-all duration-300 flex items-start gap-5 disabled:opacity-30 disabled:cursor-not-allowed group mb-1",
+                      activeLesson === index 
+                        ? "bg-white border-gray-100 shadow-xl shadow-black/5 ring-1 ring-black/5" 
+                        : "bg-transparent border-transparent hover:bg-white hover:border-gray-50"
                     )}
                   >
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors",
+                      "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border transition-all duration-500",
                       activeLesson === index 
-                        ? "bg-[#0EA5E9] border-[#0EA5E9] text-white" 
+                        ? "bg-black text-white shadow-xl shadow-black/20" 
                         : isCompleted
-                          ? "bg-green-50 border-green-200 text-green-500"
-                          : "border-gray-200 text-gray-400"
+                          ? "bg-green-50 border-green-100 text-green-600"
+                          : "bg-white border-gray-100 text-gray-300"
                     )}>
-                      {locked ? <Target size={14} className="opacity-50" /> : (isCompleted ? <CheckCircle size={16} /> : index + 1)}
+                      {locked ? <Target size={18} /> : (isCompleted ? <CheckCircle size={20} /> : <span className="font-black text-lg">{index + 1}</span>)}
                     </div>
-                    <div className="flex-grow">
+                    <div className="flex-grow pt-1">
                       <h4 className={cn(
-                        "text-sm font-bold mb-1",
-                        activeLesson === index ? "text-black" : "text-gray-600"
+                        "text-sm font-black mb-2 tracking-tight transition-colors duration-300 group-hover:text-black",
+                        activeLesson === index ? "text-black" : "text-gray-500"
                       )}>
                         {lesson.title}
                       </h4>
-                      <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                        {(() => {
-                           const Icon = iconMap[lesson.icon || 'PlayCircle'] || PlayCircle;
-                           return <Icon size={12} />;
-                        })()}
-                        {lesson.duration}
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          {(() => {
+                             const Icon = iconMap[lesson.icon || 'PlayCircle'] || PlayCircle;
+                             return <Icon size={12} />;
+                          })()}
+                          {lesson.duration}
+                        </div>
+                        {hasQuiz && (
+                          <div className={cn(
+                            "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+                            quizPassed ? "bg-green-50 text-green-600 border-green-100" : "bg-blue-50 text-blue-600 border-blue-100"
+                          )}>
+                            Quiz {quizPassed ? 'Passed' : 'Required'}
+                          </div>
+                        )}
                       </div>
                     </div>
-                    {isCompleted && <CheckCircle size={18} className="text-green-500 shrink-0" />}
                   </button>
                 );
              })}
              
              {currentProgress === 100 && (
-               <div className="p-8 bg-blue-50/50">
+               <div className="p-8 mt-6 rounded-[32px] bg-gradient-to-br from-black to-gray-800 text-white shadow-2xl overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000" />
                   {hasCertificate ? (
-                    <div className="text-center">
-                       <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
-                          <Award className="text-green-500" size={32} />
-                       </div>
-                       <p className="text-sm font-bold text-green-600 mb-4">Certificate Earned!</p>
-                       <div className="space-y-2">
-                         <Button onClick={() => setShowCertView(true)} variant="primary" size="sm" fullWidth className="gap-2 bg-[#0EA5E9] hover:bg-blue-700">
-                           <Award size={16} /> View & Download
+                    <div className="relative z-10 text-center">
+                       <Award className="text-amber-400 mx-auto mb-6 drop-shadow-lg" size={48} strokeWidth={1} />
+                       <h3 className="text-xl font-black mb-2 tracking-tight">Course Graduation</h3>
+                       <p className="text-xs text-white/50 mb-8 max-w-[200px] mx-auto font-medium leading-relaxed">Alhamdulillah, you have achieved the professional certification!</p>
+                       <div className="space-y-3">
+                         <Button onClick={() => setShowCertView(true)} size="lg" fullWidth className="bg-white text-black hover:bg-gray-100 rounded-2xl h-14 font-black">
+                           VIEW BADGE
                          </Button>
                          <Link to="/dashboard" className="block">
-                           <Button variant="ghost" size="sm" fullWidth>Back to Dashboard</Button>
+                           <Button variant="ghost" size="sm" fullWidth className="text-white/60 hover:text-white border-white/10 hover:bg-white/5">DASHBOARD</Button>
                          </Link>
                        </div>
                     </div>
                   ) : (
-                    <div className="text-center">
-                       <Award className="mx-auto text-[#0EA5E9] mb-2" size={32} />
-                       <p className="text-xs text-gray-500 mb-4">You've completed all lessons. Take the final exam to earn your certificate.</p>
-                       <Button fullWidth onClick={() => { setQuizLessonId(undefined); setIsQuizOpen(true); }}>Take Final Exam</Button>
+                    <div className="relative z-10 text-center">
+                       <Target className="text-white/30 mx-auto mb-4" size={40} />
+                       <h3 className="text-xl font-black mb-2 tracking-tight">Final Assessment</h3>
+                       <p className="text-xs text-white/50 mb-8 font-medium leading-relaxed">Complete the final grand test to earn your verified certificate.</p>
+                       <Button fullWidth size="lg" className="bg-white text-black hover:bg-gray-100 rounded-2xl h-14 font-black" onClick={() => { setQuizLessonId(undefined); setIsQuizOpen(true); }}>
+                         START EXAM
+                       </Button>
                     </div>
                   )}
                </div>

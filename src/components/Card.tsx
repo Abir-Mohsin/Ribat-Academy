@@ -38,10 +38,10 @@ export function Card({
 }: CardProps) {
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: '0 12px 24px -10px rgba(0,0,0,0.15)' }}
+      whileHover={{ y: -6, boxShadow: '0 20px 40px -12px rgba(0,0,0,0.1)' }}
       className={cn(
-        "bg-[var(--color-card-bg)] rounded-[12px] overflow-hidden flex flex-col group transition-all duration-300",
-        "border border-[var(--color-card-border)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]",
+        "bg-white rounded-[24px] overflow-hidden flex flex-col group transition-all duration-500",
+        "border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)]",
         className
       )}
     >
@@ -81,19 +81,19 @@ export function Card({
           />
         )}
         
-        <div className="flex flex-col gap-2 mt-auto pt-2">
+        <div className="flex flex-col gap-3 mt-auto pt-4">
           {price !== undefined && (
-            <div className="text-[#111111] font-bold text-lg mb-1">
+            <div className="text-black font-black text-2xl tracking-tight mb-1">
               ৳{price}
             </div>
           )}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {secondaryButtonText && onSecondaryClick && (
               <button
                 onClick={onSecondaryClick}
                 className={cn(
-                  "flex-1 bg-gray-100 text-black px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200",
-                  "hover:bg-gray-200 active:scale-95 duration-200"
+                  "flex-1 bg-gray-50 text-gray-400 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all border border-gray-100",
+                  "hover:bg-gray-100 hover:text-black active:scale-95 duration-300"
                 )}
               >
                 {secondaryButtonText}
@@ -102,8 +102,8 @@ export function Card({
             <button
               onClick={onClick}
               className={cn(
-                "flex-1 bg-[var(--color-button-bg)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                "hover:bg-[var(--color-button-hover)] active:scale-95 duration-200"
+                "flex-1 bg-black text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all",
+                "hover:bg-gray-800 active:scale-95 duration-300 shadow-lg shadow-black/10"
               )}
             >
               {buttonText}

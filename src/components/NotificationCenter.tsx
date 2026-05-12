@@ -53,7 +53,7 @@ export function NotificationCenter() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-full transition-all"
+        className="relative p-2 text-gray-300 hover:text-white rounded-full transition-all"
       >
         <Bell size={20} />
         {unreadCount > 0 && (

@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Poppins", sans-serif;
+  --font-sans: "Inter", "Tiro Bangla", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Poppins", "Hind Siliguri", sans-serif;
   --color-primary-dark: var(--theme-primary-dark, #002D34);
   --color-primary-light: var(--theme-primary-light, #0B4F4F);
   --color-button-bg: var(--theme-button-bg, #0B4F4F);
@@ -20,6 +21,37 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply text-slate-900 antialiased selection:bg-black selection:text-white;
+    overflow-x: hidden;
+  }
+
+  p {
+    @apply leading-relaxed;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* Custom Premium Utilities */
+.premium-blur {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-500;
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
 }
 
 .no-scrollbar::-webkit-scrollbar {

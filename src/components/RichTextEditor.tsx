@@ -31,7 +31,7 @@ const formats = [
 
 export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
   return (
-    <div className={className}>
+    <div className={`rich-text-wrapper ${className || ''}`}>
       <ReactQuill 
         theme="snow"
         value={value}
@@ -39,13 +39,20 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         modules={modules}
         formats={formats}
         placeholder={placeholder}
-        className="bg-white rounded-xl overflow-hidden"
+        className="bg-white rounded-xl overflow-hidden flex flex-col h-full"
       />
       <style>{`
+        .rich-text-wrapper {
+          display: flex;
+          flex-direction: column;
+        }
         .ql-container {
           border-bottom-left-radius: 0.75rem;
           border-bottom-right-radius: 0.75rem;
+          flex-grow: 1;
+          height: 100%;
           min-height: 150px;
+          overflow-y: auto;
           font-family: inherit;
         }
         .ql-toolbar {
@@ -53,6 +60,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           border-top-right-radius: 0.75rem;
           background: #f9fafb;
           border-color: #e5e7eb !important;
+          flex-shrink: 0;
         }
         .ql-container.ql-snow {
           border-color: #e5e7eb !important;
@@ -60,6 +68,10 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         .ql-editor {
           font-size: 0.875rem;
           line-height: 1.6;
+          min-height: 100%;
+          height: max-content;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
         }
       `}</style>
     </div>

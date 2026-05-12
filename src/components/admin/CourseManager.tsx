@@ -387,94 +387,100 @@ export function CourseManager() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-              <th className="px-6 py-4">Course Details</th>
-              <th className="px-6 py-4">Price</th>
-              <th className="px-6 py-4">Lessons</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {loading ? (
-              <tr>
-                <td colSpan={5} className="p-20 text-center">
-                  <Loader2 className="animate-spin mx-auto text-gray-300" size={32} />
-                </td>
+        <div className="overflow-x-auto no-scrollbar">
+          <table className="w-full text-left min-w-[800px]">
+            <thead>
+              <tr className="bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                <th className="px-6 py-4 w-1/3">Course Details</th>
+                <th className="px-6 py-4 whitespace-nowrap">Price</th>
+                <th className="px-6 py-4 whitespace-nowrap">Lessons</th>
+                <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                <th className="px-6 py-4 whitespace-nowrap text-right">Actions</th>
               </tr>
-            ) : filteredCourses.map(course => (
-              <tr key={course.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 aspect-video bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                      {course.thumbnail ? (
-                        <img src={getThumbnailUrl(course.thumbnail)} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20} /></div>
-                      )}
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="p-20 text-center">
+                    <Loader2 className="animate-spin mx-auto text-gray-300" size={32} />
+                  </td>
+                </tr>
+              ) : filteredCourses.map(course => (
+                <tr key={course.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4 max-w-[300px]">
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 aspect-video bg-gray-100 rounded-lg overflow-hidden shrink-0 shadow-sm border border-gray-100">
+                        {course.thumbnail ? (
+                          <img src={getThumbnailUrl(course.thumbnail)} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20} /></div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-grow">
+                        <p className="font-bold text-sm truncate text-black">{course.title}</p>
+                        <p className="text-xs text-gray-400 truncate mt-0.5" title={course.description.replace(/<[^>]+>/g, '') || 'No description'}>
+                          {course.description ? course.description.replace(/<[^>]+>/g, '') : 'No description'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-sm block">{course.title}</p>
-                      <p className="text-xs text-gray-400 line-clamp-1">{course.description}</p>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="font-bold text-sm select-none">৳{course.price}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+                      <Video size={14} className="text-blue-500" />
+                      {course.lessons?.length || 0} Lessons
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-bold text-sm select-none">৳{course.price}</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Video size={14} className="text-blue-500" />
-                    {course.lessons?.length || 0} Lessons
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <button 
-                    onClick={async () => {
-                      const newStatus = course.status === 'published' ? 'draft' : 'published';
-                      await updateDoc(doc(db, 'courses', course.id!), { status: newStatus });
-                      setCourses(courses.map(c => c.id === course.id ? { ...c, status: newStatus } : c));
-                    }}
-                    className={cn(
-                      "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase transition-colors hover:ring-1",
-                      course.status === 'published' ? "bg-green-100 text-green-700 ring-green-200" : "bg-gray-100 text-gray-600 ring-gray-200"
-                    )}
-                  >
-                    {course.status}
-                  </button>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <button 
-                      onClick={() => {
-                        setEditingCourse(course);
-                        setIsEditing(true);
+                      onClick={async () => {
+                        const newStatus = course.status === 'published' ? 'draft' : 'published';
+                        await updateDoc(doc(db, 'courses', course.id!), { status: newStatus });
+                        setCourses(courses.map(c => c.id === course.id ? { ...c, status: newStatus } : c));
                       }}
-                      className="p-2 text-gray-400 hover:text-[#0EA5E9] transition-colors"
+                      className={cn(
+                        "text-[10px] font-bold px-3 py-1 rounded-full uppercase transition-colors hover:ring-1 whitespace-nowrap",
+                        course.status === 'published' ? "bg-green-100 text-green-700 ring-green-200" : "bg-gray-100 text-gray-600 ring-gray-200"
+                      )}
                     >
-                      <Edit2 size={18} />
+                      {course.status}
                     </button>
-                    <button 
-                      onClick={() => course.id && handleDelete(course.id)}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filteredCourses.length === 0 && !loading && (
-              <tr>
-                <td colSpan={5} className="p-20 text-center text-gray-400">
-                   No courses found. Add your first course to get started.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => {
+                          setEditingCourse(course);
+                          setIsEditing(true);
+                        }}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-white hover:bg-blue-500 transition-all shadow-sm group"
+                        title="Edit Course"
+                      >
+                        <Edit2 size={16} className="group-hover:scale-110 transition-transform" />
+                      </button>
+                      <button 
+                        onClick={() => course.id && handleDelete(course.id)}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white transition-all shadow-sm group"
+                        title="Delete Course"
+                      >
+                        <Trash2 size={16} className="group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredCourses.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5} className="p-20 text-center text-gray-400">
+                     No courses found. Add your first course to get started.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

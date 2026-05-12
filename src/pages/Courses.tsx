@@ -69,68 +69,80 @@ export function Courses() {
   });
 
   return (
-    <div className="pt-20 pb-32 px-4 bg-white">
+    <div className="pt-24 pb-32 px-6 bg-white font-sans">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-12">
-          <h1 className="text-4xl font-bold mb-6">Our Courses</h1>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-grow space-y-4">
-               <div className="flex bg-gray-100 p-1 rounded-2xl w-fit">
-                  {[
-                    { id: 'all', name: 'All Assets' },
-                    { id: 'recorded', name: 'Recorded Courses' },
-                    { id: 'live', name: 'Live Classes' }
-                  ].map(tab => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveType(tab.id as any)}
-                      className={cn(
-                        "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
-                        activeType === tab.id ? "bg-white text-black shadow-sm" : "text-gray-400 hover:text-gray-600"
-                      )}
-                    >
-                      {tab.name}
-                    </button>
-                  ))}
-               </div>
-               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search for courses or live sessions..."
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+        <header className="mb-20 text-center md:text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100 mb-6 mx-auto md:mx-0">
+            <span className="w-2 h-2 rounded-full bg-[#0EA5E9]" />
+            <span className="text-[10px] font-black uppercase tracking-[2px] text-gray-400">Knowledge Catalog</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black mb-12 tracking-tight">Invest in Your <span className="text-gray-300">Akhira.</span></h1>
+          
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-gray-50/50 p-2 rounded-[32px] border border-gray-100 backdrop-blur-xl">
+             <div className="flex bg-white shadow-xl shadow-black/5 p-1.5 rounded-[24px] overflow-x-auto no-scrollbar w-full md:w-auto">
+                {[
+                  { id: 'all', name: 'Infinite' },
+                  { id: 'recorded', name: 'Recorded' },
+                  { id: 'live', name: 'Live' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveType(tab.id as any)}
+                    className={cn(
+                      "px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 whitespace-nowrap",
+                      activeType === tab.id ? "bg-black text-white shadow-2xl shadow-black/20" : "text-gray-400 hover:text-black"
+                    )}
+                  >
+                    {tab.name}
+                  </button>
+                ))}
+             </div>
+             
+             <div className="relative flex-grow w-full md:w-auto">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={20} />
+              <input
+                type="text"
+                placeholder="Search assets..."
+                className="w-full pl-16 pr-6 py-5 bg-white border border-gray-100 rounded-[24px] focus:outline-none focus:ring-4 focus:ring-black/5 font-bold transition-all text-sm placeholder:text-gray-300"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <button className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 border border-gray-100 rounded-xl font-medium hover:bg-gray-100 transition-colors h-fit self-end md:self-auto">
-              <SlidersHorizontal size={20} />
-              Filter
-            </button>
           </div>
         </header>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 4, 5, 6].map(i => (
-              <div key={i} className="aspect-[3/4] bg-gray-50 rounded-3xl animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[1, 2, 4, 5, 6, 7, 8].map(i => (
+              <div key={i} className="aspect-[3/4.2] bg-gray-50 rounded-[40px] animate-pulse relative overflow-hidden">
+                 <div className="absolute inset-0 bg-gradient-to-t from-gray-100 to-transparent opacity-50" />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
             {filteredItems.map(item => (
               <Card 
                 key={item.id} 
                 {...item}
                 image={item.thumbnail}
-                subtitle={item.type === 'live_class' ? `Next Session: ${new Date(item.startTime).toLocaleString()}` : item.instructor?.name}
-                badge={item.type === 'live_class' ? 'LIVE' : 'COURSE'}
+                subtitle={item.type === 'live_class' ? `STREAMING AT: ${new Date(item.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : item.instructor?.name}
+                badge={item.type === 'live_class' ? 'LIVE NOW' : 'MASTERCLASS'}
                 onClick={() => handleEnroll(item)}
-                secondaryButtonText="Details"
+                secondaryButtonText="DETAILS"
                 onSecondaryClick={() => navigate(`/courses/${item.id}`)}
               />
             ))}
+          </div>
+        )}
+        
+        {!loading && filteredItems.length === 0 && (
+          <div className="py-40 text-center">
+            <div className="w-24 h-24 bg-gray-50 rounded-[40px] flex items-center justify-center mx-auto mb-8 border border-gray-100">
+               <Search className="text-gray-200" size={40} />
+            </div>
+            <h3 className="text-2xl font-black mb-2">No matching assets</h3>
+            <p className="text-gray-400 font-medium">Try broadening your search criteria.</p>
           </div>
         )}
       </div>

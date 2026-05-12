@@ -134,7 +134,8 @@ export function CertificateView({
 
   return (
     <div className="flex flex-col items-center w-full max-w-5xl mx-auto p-4 md:p-8 bg-slate-50/50 rounded-[40px] animate-in fade-in duration-700">
-      <div className="w-full overflow-x-auto pb-8 no-scrollbar scroll-smooth">
+      <p className="md:hidden text-xs text-gray-500 font-bold mb-4 uppercase tracking-widest text-center w-full">Scroll horizontally to view</p>
+      <div className="w-full overflow-x-auto pb-4 md:pb-8 no-scrollbar scroll-smooth relative">
         <div 
           ref={certificateRef}
           className="certificate-container relative bg-white min-w-[1000px] aspect-[1.414/1] shadow-2xl w-full mx-auto overflow-hidden bg-cover bg-center"
