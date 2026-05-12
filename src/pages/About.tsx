@@ -58,7 +58,7 @@ export function About() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-gray-500 leading-relaxed break-words"
+              className="rich-text-content text-xl text-gray-500 leading-relaxed break-words"
               dangerouslySetInnerHTML={{ __html: settings?.aboutDescription || "Ribat Academy was founded on a simple belief: that education should be holistic. We don't just teach subjects; we nurture souls and empower minds with the tools they need to succeed in this life and the next." }}
             />
         </div>

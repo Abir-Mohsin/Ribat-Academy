@@ -92,7 +92,7 @@ export function CourseDetails() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight mb-6">
               {course.title}
             </h1>
-            <div className="text-gray-500 text-lg md:text-xl mb-8 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: course.description }} />
+            <div className="rich-text-content text-gray-500 text-lg md:text-xl mb-8 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: course.description }} />
             <div className="flex flex-wrap items-center gap-4">
               <Button size="lg" onClick={handleEnroll} className="text-lg px-8">
                 Enroll Now - ৳{course.price}
@@ -184,7 +184,7 @@ export function CourseDetails() {
                   </div>
                 </div>
                 {course.instructor?.bio && (
-                  <div className="text-gray-600 text-sm leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: course.instructor.bio }} />
+                  <div className="rich-text-content text-gray-600 text-sm leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: course.instructor.bio }} />
                 )}
               </div>
             )}

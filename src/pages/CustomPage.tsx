@@ -52,7 +52,7 @@ export function CustomPage({ type, title }: CustomPageProps) {
          </button>
          <h1 className="text-3xl md:text-5xl font-bold mb-8">{title}</h1>
          
-         <div className="prose prose-lg max-w-none prose-p:text-gray-600 prose-headings:font-bold prose-a:text-[#0EA5E9] break-words" dangerouslySetInnerHTML={{ __html: content }} />
+         <div className="rich-text-content max-w-none text-gray-600 break-words" dangerouslySetInnerHTML={{ __html: content }} />
       </div>
     </div>
   );

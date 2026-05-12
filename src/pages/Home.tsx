@@ -127,8 +127,8 @@ export function Home() {
               className="text-5xl lg:text-7xl font-bold text-[var(--color-text-heading)] leading-[1.1] mb-8"
               dangerouslySetInnerHTML={{ __html: settings?.heroTitle || "Islamic + Modern Education Platform" }}
             />
-            <p 
-              className="text-lg text-[var(--color-text-body)] mb-10 max-w-xl leading-relaxed"
+            <div 
+              className="rich-text-content text-lg text-[var(--color-text-body)] mb-10 max-w-xl leading-relaxed"
               dangerouslySetInnerHTML={{ __html: settings?.heroDescription || "Bridging the gap between timeless Islamic values and contemporary skills. Join over 5,000+ students worldwide mastering Arabic, Deen, and Digital Technology." }}
             />
             <div className="flex flex-col sm:flex-row gap-4">
@@ -258,7 +258,7 @@ export function Home() {
       </section>
 
       {/* Academy Features */}
-      <section className="py-24 bg-white px-4 overflow-hidden">
+      <section className="py-12 lg:py-16 bg-white px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {homeFeatures && homeFeatures.length > 0 ? (
             <div className="flex flex-wrap justify-center gap-3 md:gap-8">
@@ -279,7 +279,7 @@ export function Home() {
                       <IconComponent className="text-white w-4 h-4 md:w-7 md:h-7" />
                     </div>
                     <h3 className="text-[11px] md:text-2xl font-bold mb-1 md:mb-4 tracking-tight md:leading-tight leading-none break-words">{feature.title}</h3>
-                    <p className="hidden md:block text-gray-600 text-sm md:text-base leading-relaxed break-words w-full" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                    <div className="hidden md:block rich-text-content text-gray-600 text-sm md:text-base leading-relaxed break-words w-full" dangerouslySetInnerHTML={{ __html: feature.description }} />
                   </div>
                 );
               })}
@@ -315,7 +315,7 @@ export function Home() {
       </section>
 
       {/* Featured Courses */}
-      <section className="py-24 bg-gray-50/50 px-4">
+      <section className="py-12 lg:py-16 bg-gray-50/50 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
             <div>
@@ -362,7 +362,7 @@ export function Home() {
       </section>
 
       {/* Featured Books / Library Section */}
-      <section className="py-24 bg-white px-4">
+      <section className="py-12 lg:py-16 bg-white px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 tracking-tight">The Ribat <span className="text-[#0EA5E9]">Bookstore</span></h2>
@@ -401,7 +401,7 @@ export function Home() {
 
       {/* Video Reviews Slider */}
       {videoReviews.length > 0 && (
-        <section className="py-24 px-4 overflow-hidden bg-white">
+        <section className="py-12 lg:py-16 px-4 overflow-hidden bg-white">
           <div className="max-w-7xl mx-auto mb-16 text-center">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">Our Students Speak</h2>
             <p className="text-gray-500">Watch recorded testimonials from students who transformed their lives at Ribat.</p>
@@ -452,7 +452,7 @@ export function Home() {
       )}
 
       {/* Testimonials Slider */}
-      <section className="py-24 bg-gray-50/50 px-4">
+      <section className="py-12 lg:py-16 bg-gray-50/50 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">What Our Students Say</h2>

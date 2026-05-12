@@ -49,9 +49,10 @@ export function CoursePlayer() {
     if (!id) return;
     const fetchQuizzes = async () => {
       try {
-        const q = query(collection(db, 'quizzes'), where('courseId', '==', id), where('status', '==', 'published'));
+        const q = query(collection(db, 'quizzes'), where('courseId', '==', id));
         const snap = await getDocs(q);
-        setAvailableQuizzes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const allQuizzes = snap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+        setAvailableQuizzes(allQuizzes.filter(q => q.status === 'published'));
       } catch (err) {
         console.error("Error fetching quizzes:", err);
       }
@@ -62,11 +63,13 @@ export function CoursePlayer() {
   useEffect(() => {
     if (!user || !id) return;
     const checkCert = async () => {
-      const q = query(collection(db, 'certificates'), where('userId', '==', user.uid), where('courseId', '==', id));
+      const q = query(collection(db, 'certificates'), where('userId', '==', user.uid));
       const snap = await getDocs(q);
-      if (!snap.empty) {
+      const userCerts = snap.docs.map(doc => doc.data() as any);
+      const courseCert = userCerts.find(cert => cert.courseId === id);
+      if (courseCert) {
         setHasCertificate(true);
-        setCertData(snap.docs[0].data());
+        setCertData(courseCert);
       }
     };
     checkCert();
@@ -307,7 +310,7 @@ export function CoursePlayer() {
              </div>
 
              <div className="max-w-4xl">
-                <div className="text-gray-500 text-lg leading-relaxed mb-12 font-medium" dangerouslySetInnerHTML={{ __html: course.lessons[activeLesson].description || 'This module provides deep insights into the subject matter. Focus on the core principles discussed in this session.' }} />
+                <div className="rich-text-content text-gray-500 text-lg leading-relaxed mb-12 font-medium" dangerouslySetInnerHTML={{ __html: course.lessons[activeLesson].description || 'This module provides deep insights into the subject matter. Focus on the core principles discussed in this session.' }} />
 
                 {isCurrentLessonCompleted && currentLessonQuiz && !isQuizPassed && (
                    <div className="mb-12 p-8 bg-black text-white rounded-[40px] shadow-2xl shadow-black/20 flex flex-col md:flex-row items-center justify-between gap-8 group">
@@ -342,7 +345,7 @@ export function CoursePlayer() {
                               <Info size={14} className="text-[#0EA5E9]" />
                               About Course
                             </h3>
-                            <div className="text-sm text-gray-600 leading-relaxed" 
+                            <div className="rich-text-content text-sm text-gray-600 leading-relaxed" 
                                  dangerouslySetInnerHTML={{ __html: course.description }} />
                           </div>
 
@@ -377,7 +380,7 @@ export function CoursePlayer() {
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{course.instructor.role}</p>
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 leading-relaxed italic"
+                            <div className="rich-text-content text-xs text-gray-500 leading-relaxed italic"
                                  dangerouslySetInnerHTML={{ __html: course.instructor.bio }} />
                           </div>
                         </div>

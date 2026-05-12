@@ -122,40 +122,42 @@ export function Dashboard() {
       setCertificates(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    // Fetch approved books
-    const qBooks = query(
-      collection(db, 'orders'), 
-      where('userId', '==', user.uid),
-      where('itemType', '==', 'book'),
-      where('status', '==', 'approved')
-    );
-    const unsubscribeBooks = onSnapshot(qBooks, async (snap) => {
-      const ordersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const booksWithDetails = await Promise.all(ordersData.map(async (order: any) => {
+    // Fetch all user orders
+    const qOrders = query(collection(db, 'orders'), where('userId', '==', user.uid));
+    const unsubscribeOrders = onSnapshot(qOrders, async (snap) => {
+      const allOrders = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() as any }))
+        .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+      
+      setOrders(allOrders);
+
+      // Extract approved books
+      const bookOrders = allOrders.filter(o => o.itemType === 'book' && o.status === 'approved');
+      const booksWithDetails = await Promise.all(bookOrders.map(async (order: any) => {
         const bookSnap = await getDoc(doc(db, 'books', order.itemId));
         return bookSnap.exists() ? { ...order, ...bookSnap.data() } : order;
       }));
       setMyBooks(booksWithDetails);
-    });
-
-    // Fetch all orders
-    const qOrders = query(collection(db, 'orders'), where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
-    const unsubscribeOrders = onSnapshot(qOrders, async (snap) => {
-      const allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setOrders(allOrders);
 
       // Extract approved live classes
-      const liveClassOrders = allOrders.filter((o: any) => o.itemType === 'live_class' && o.status === 'approved');
+      const liveClassOrders = allOrders.filter(o => o.itemType === 'live_class' && o.status === 'approved');
       const liveClassesDetails = await Promise.all(liveClassOrders.map(async (order: any) => {
         const docSnap = await getDoc(doc(db, 'live_classes', order.itemId));
         return docSnap.exists() ? { ...order, ...docSnap.data() } : order;
       }));
       setMyLiveClasses(liveClassesDetails);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'orders');
     });
 
-    const qNotifs = query(collection(db, 'notifications'), where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
+    const qNotifs = query(collection(db, 'notifications'), where('userId', '==', user.uid));
     const unsubscribeNotifs = onSnapshot(qNotifs, (snap) => {
-      setNotifications(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const notifs = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() as any }))
+        .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+      setNotifications(notifs);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'notifications');
     });
 
     // Listen for real-time progress updates
@@ -191,14 +193,13 @@ export function Dashboard() {
       setMyCourses(coursesWithDetails);
       setLoading(false);
     }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'progress');
       setLoading(false);
+      handleFirestoreError(error, OperationType.LIST, 'progress');
     });
 
     return () => {
       unsubscribe();
       unsubscribeCerts();
-      unsubscribeBooks();
       unsubscribeOrders();
       unsubscribeNotifs();
     };
@@ -260,9 +261,25 @@ export function Dashboard() {
         {headerSection}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
-             <Loader2 className="animate-spin mb-4" size={48} />
-             <p>Loading your profile data...</p>
+          <div className="space-y-8">
+             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="bg-white p-8 rounded-[24px] shadow-sm border border-gray-100 flex flex-col gap-4 animate-pulse">
+                     <div className="w-24 h-3 bg-gray-100 rounded-full"></div>
+                     <div className="w-16 h-8 bg-gray-100 rounded-full"></div>
+                  </div>
+                ))}
+             </div>
+             <div className="bg-white rounded-[32px] border border-gray-100 overflow-hidden shadow-sm h-64 animate-pulse">
+                <div className="p-8 border-b border-gray-100 bg-gray-50/30 flex justify-between">
+                   <div className="w-40 h-6 bg-gray-200 rounded-full"></div>
+                   <div className="w-24 h-6 bg-gray-200 rounded-full"></div>
+                </div>
+                <div className="p-8 space-y-4">
+                   <div className="w-full h-20 bg-gray-50 rounded-2xl"></div>
+                   <div className="w-full h-20 bg-gray-50 rounded-2xl"></div>
+                </div>
+             </div>
           </div>
         ) : (
           <>
@@ -365,7 +382,92 @@ export function Dashboard() {
               </div>
             )}
 
-            {/* Other tabs remain refined by previous multi_edit */}
+            {activeTab === 'live-classes' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 font-sans">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {myLiveClasses.map(liveClass => (
+                    <div key={liveClass.id} className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all duration-300">
+                      <div className="aspect-video relative">
+                        <img src={getThumbnailUrl(liveClass.thumbnail)} alt={liveClass.title} className="w-full h-full object-cover" />
+                        <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                          <Video size={12} />
+                          Live Class
+                        </div>
+                      </div>
+                      <div className="p-6 flex flex-col flex-grow">
+                        <h4 className="font-bold text-lg mb-4">{liveClass.title || liveClass.itemTitle}</h4>
+                        <div className="mt-auto pt-4 border-t border-gray-50 text-sm">
+                          {liveClass.startTime && liveClass.meetingLink ? (
+                            <LiveCountdown startTime={liveClass.startTime} meetingLink={liveClass.meetingLink} />
+                          ) : (
+                            <p className="text-gray-400 text-center py-4 bg-gray-50 rounded-xl">Session details pending</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {myLiveClasses.length === 0 && (
+                    <div className="col-span-full py-20 text-center text-gray-400 bg-white rounded-[32px] border border-dashed border-gray-200">
+                      <Video size={48} className="mx-auto mb-6 opacity-20" />
+                      <h4 className="text-black font-bold mb-2">No active live classes</h4>
+                      <p className="mb-6">You haven't enrolled in any upcoming live sessions.</p>
+                      <Link to="/courses?type=live">
+                        <Button variant="outline">Browse Live Sessions</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'library' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 font-sans">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                  {myBooks.map(book => (
+                    <div key={book.id} className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all duration-300">
+                      <div className="aspect-[3/4] relative bg-gray-50 p-4 shrink-0">
+                        <img src={getThumbnailUrl(book.coverImage || book.thumbnail)} alt={book.title || book.itemTitle} className="w-full h-full object-cover rounded-xl shadow-md" />
+                      </div>
+                      <div className="p-6 flex flex-col flex-grow text-center">
+                        <h4 className="font-bold text-lg mb-2">{book.title || book.itemTitle}</h4>
+                        {book.author && <p className="text-sm text-gray-500 mb-6">{book.author}</p>}
+                        <div className="mt-auto">
+                          {book.fileUrl || book.pdfFile || book.downloadUrl ? (
+                            <a href={book.fileUrl || book.pdfFile || getDownloadUrl(book.downloadUrl)} target="_blank" rel="noreferrer" className="block w-full">
+                              <Button fullWidth className="gap-2 shrink-0">
+                                {(book.fileUrl || book.pdfFile) ? (
+                                  <><BookOpen size={18} /> Read Book</>
+                                ) : (
+                                  <><Download size={18} /> Download Asset</>
+                                )}
+                              </Button>
+                            </a>
+                          ) : book.status === 'approved' ? (
+                            <Button fullWidth variant="outline" className="gap-2 shrink-0 text-gray-400 border-gray-200" disabled>
+                              Content Unavailable
+                            </Button>
+                          ) : (
+                            <Button fullWidth variant="outline" className="gap-2 shrink-0 text-gray-400 border-gray-200" disabled>
+                              Processing...
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {myBooks.length === 0 && (
+                    <div className="col-span-full py-20 text-center text-gray-400 bg-white rounded-[32px] border border-dashed border-gray-200">
+                      <Bookmark size={48} className="mx-auto mb-6 opacity-20" />
+                      <h4 className="text-black font-bold mb-2">Library is empty</h4>
+                      <p className="mb-6">You haven't purchased any books or materials yet.</p>
+                      <Link to="/courses">
+                        <Button variant="outline">Browse Materials</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {activeTab === 'notifications' && (
               <div className="max-w-2xl space-y-4 font-sans animate-in fade-in slide-in-from-bottom-4 duration-500">
