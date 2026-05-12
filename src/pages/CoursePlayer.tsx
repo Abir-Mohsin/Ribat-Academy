@@ -214,7 +214,7 @@ export function CoursePlayer() {
           </div>
           <div className="pt-20">
             <CertificateView 
-              userName={userData?.name || 'Student'}
+              userName={userData?.name || user?.displayName || 'Student'}
               courseTitle={course.title}
               issueDate={certData.issuedAt?.toDate ? certData.issuedAt.toDate().toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
               certificateId={`${course?.id?.slice(0,8)}-${user?.uid?.slice(0,8)}`}
@@ -514,7 +514,7 @@ export function CoursePlayer() {
           lessonId={quizLessonId}
           courseTitle={course.title}
           userId={user?.uid || ''}
-          userName={userData?.name || 'Student'}
+          userName={userData?.name || user?.displayName || 'Student'}
           onSuccess={async () => {
              if (quizLessonId) {
                 // Update progress with completed quiz

@@ -9,7 +9,7 @@ import { NotificationCenter } from './NotificationCenter';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, userData, signOut, signInWithGoogle } = useAuth();
+  const { user, userData, signOut, signInWithGoogle, loading } = useAuth();
   const location = useLocation();
 
   const navLinks = [
@@ -57,9 +57,9 @@ export function Navbar() {
               <NotificationCenter />
               <Link to="/dashboard" className="flex items-center gap-3 p-1 pr-4 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all group">
                 <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-black text-sm uppercase group-hover:scale-105 transition-transform">
-                  {userData?.name?.[0] || user.email?.[0].toUpperCase()}
+                  {userData?.name?.[0] || user?.displayName?.[0] || user.email?.[0].toUpperCase()}
                 </div>
-                <span className="text-xs font-black uppercase tracking-widest text-white/80">{userData?.name?.split(' ')[0] || 'Dashboard'}</span>
+                <span className="text-xs font-black uppercase tracking-widest text-white/80">{userData?.name?.split(' ')[0] || user?.displayName?.split(' ')[0] || (loading ? '...' : 'Dashboard')}</span>
               </Link>
               <button 
                 onClick={() => signOut()}
@@ -128,10 +128,10 @@ export function Navbar() {
                         >
                           <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-black">
-                               {userData?.name?.[0] || user.email?.[0].toUpperCase()}
+                               {userData?.name?.[0] || user?.displayName?.[0] || user.email?.[0].toUpperCase()}
                             </div>
                             <div>
-                               <p className="font-black text-black">Member Profile</p>
+                               <p className="font-black text-black">{userData?.name || user?.displayName || 'Member Profile'}</p>
                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Manage Account</p>
                             </div>
                           </div>

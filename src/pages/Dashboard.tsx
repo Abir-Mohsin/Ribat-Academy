@@ -207,7 +207,7 @@ export function Dashboard() {
 
   const headerSection = (
     <header className="mb-10">
-      <h2 className="text-2xl font-bold">Assalamu Alaikum, {userData?.name}!</h2>
+      <h2 className="text-2xl font-bold">Assalamu Alaikum, {userData?.name || user?.displayName || 'Student'}!</h2>
       <p className="text-gray-500">Welcome back to your learning journey.</p>
     </header>
   );
@@ -223,7 +223,7 @@ export function Dashboard() {
              </Button>
           </div>
           <CertificateView 
-            userName={printingCert.userName || userData?.name}
+            userName={printingCert.userName || userData?.name || user?.displayName || 'Student'}
             courseTitle={printingCert.courseTitle}
             issueDate={printingCert.issuedAt?.toDate ? printingCert.issuedAt.toDate().toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
             certificateId={`${printingCert.courseId?.slice(0,8)}-${user?.uid?.slice(0,8)}`}
@@ -573,11 +573,11 @@ export function Dashboard() {
                    <div className="absolute top-0 left-0 w-full h-2 bg-black opacity-5" />
                    <div className="flex flex-col md:flex-row items-center gap-8 font-sans">
                       <div className="w-32 h-32 rounded-[40px] bg-gray-50 border-4 border-white shadow-xl flex items-center justify-center text-4xl shrink-0 font-black text-black">
-                         {userData?.name?.[0]}
+                         {userData?.name?.[0] || user?.displayName?.[0] || 'S'}
                       </div>
                       <div className="text-center md:text-left">
-                        <h3 className="text-3xl font-black mb-1">{userData?.name}</h3>
-                        <p className="text-lg text-gray-400 font-medium mb-4">{userData?.email}</p>
+                        <h3 className="text-3xl font-black mb-1">{userData?.name || user?.displayName || 'Student'}</h3>
+                        <p className="text-lg text-gray-400 font-medium mb-4">{userData?.email || user?.email}</p>
                         <div className="flex items-center justify-center md:justify-start gap-4">
                           <div className="text-[10px] uppercase font-bold tracking-[2px] text-[#0EA5E9] bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100">
                             Verified {userData?.role}
@@ -596,11 +596,11 @@ export function Dashboard() {
                     <div className="space-y-6">
                       <div>
                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
-                        <input type="text" defaultValue={userData?.name} className="w-full px-6 py-4 bg-gray-50 rounded-2xl focus:outline-none border border-gray-100 transition-all focus:bg-white focus:ring-1 focus:ring-black/5" />
+                        <input type="text" defaultValue={userData?.name || user?.displayName || ''} className="w-full px-6 py-4 bg-gray-50 rounded-2xl focus:outline-none border border-gray-100 transition-all focus:bg-white focus:ring-1 focus:ring-black/5" />
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
-                        <input type="email" value={userData?.email} disabled className="w-full px-6 py-4 bg-gray-100 border border-transparent text-gray-400 rounded-2xl focus:outline-none cursor-not-allowed" />
+                        <input type="email" value={userData?.email || user?.email || ''} disabled className="w-full px-6 py-4 bg-gray-100 border border-transparent text-gray-400 rounded-2xl focus:outline-none cursor-not-allowed" />
                       </div>
                       <Button fullWidth size="lg">Save Changes</Button>
                     </div>
