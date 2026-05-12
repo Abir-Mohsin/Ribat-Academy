@@ -101,7 +101,7 @@
   font-weight: bold;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: var(--color-text-heading, #111);
+  color: inherit;
 }
 .rich-text-content h1 { font-size: 2.25rem; }
 .rich-text-content h2 { font-size: 1.875rem; }
