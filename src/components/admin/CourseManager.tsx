@@ -222,12 +222,12 @@ export function CourseManager() {
 
           <div className="space-y-4 pt-4 border-t border-gray-50">
              <h4 className="font-bold text-sm">Detailed Learning Objectives</h4>
-             <p className="text-[10px] text-gray-400 -mt-2">Enter one objective per line. These will be displayed as a bulleted list.</p>
-             <textarea 
-                value={(editingCourse?.objectives || []).join('\n')}
-                onChange={e => setEditingCourse({...editingCourse, objectives: e.target.value.split('\n').filter(o => o.trim() !== '')})}
-                className="w-full h-[250px] px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 resize-y"
-                placeholder="Student will learn to...&#10;Master the foundations of...&#10;Understand complete grammar..."
+             <p className="text-[10px] text-gray-400 -mt-2">Use the rich text editor to format your learning objectives.</p>
+             <RichTextEditor
+                value={typeof editingCourse?.objectives === 'string' ? editingCourse.objectives : (editingCourse?.objectives?.join('<br />') || '')}
+                onChange={content => setEditingCourse({...editingCourse, objectives: [content] as any})}
+                placeholder="What will the students learn?"
+                className="h-[250px] mb-14"
              />
           </div>
 

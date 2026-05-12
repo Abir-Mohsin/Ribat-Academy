@@ -124,18 +124,22 @@ export function CourseDetails() {
           {course.objectives && course.objectives.length > 0 && (
             <section>
               <h2 className="text-3xl font-bold mb-8">What you'll learn</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {course.objectives.map((obj: string, i: number) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="mt-1 bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+              {course.objectives.length === 1 && course.objectives[0].includes('<') ? (
+                <div className="rich-text-content text-gray-700" dangerouslySetInnerHTML={{ __html: course.objectives[0] }} />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {course.objectives.map((obj: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="mt-1 bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">{obj}</p>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{obj}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
