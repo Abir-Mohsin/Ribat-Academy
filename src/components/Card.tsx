@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/lib/utils';
 import { LucideIcon } from 'lucide-react';
@@ -36,6 +37,8 @@ export function Card({
   className,
   imageClassName,
 }: CardProps) {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
   return (
     <motion.div
       whileHover={{ y: -6, boxShadow: '0 20px 40px -12px rgba(0,0,0,0.1)' }}
@@ -65,38 +68,47 @@ export function Card({
         )}
       </div>
 
-      <div className="p-4 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-[#111111] line-clamp-1 mb-1">
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        <h3 className="text-sm sm:text-lg font-bold text-[#111111] line-clamp-2 mb-1 leading-tight">
           {title}
         </h3>
         {subtitle && (
-          <p className="text-xs text-blue-500 font-bold uppercase tracking-wider mb-2">
+          <p className="text-[10px] sm:text-xs text-blue-500 font-bold uppercase tracking-wider mb-2">
             {subtitle}
           </p>
         )}
-        {description && (
-          <div 
-            className="text-gray-500 text-sm line-clamp-4 mb-4 flex-grow min-h-[4rem] break-words hyphens-auto text-left"
+        
+        {description && showFullDescription && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="text-gray-500 text-xs sm:text-sm mb-4 break-words hyphens-auto text-left"
             dangerouslySetInnerHTML={{ __html: description }}
           />
         )}
         
-        <div className="flex flex-col gap-3 mt-auto pt-4">
+        <div className="flex flex-col gap-2 sm:gap-3 mt-auto pt-3 sm:pt-4">
           {price !== undefined && (
-            <div className="text-black font-black text-2xl tracking-tight mb-1">
+            <div className="text-black font-black text-lg sm:text-2xl tracking-tight mb-1">
               ৳{price}
             </div>
           )}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-            {secondaryButtonText && onSecondaryClick && (
+            {(secondaryButtonText || description) && (
               <button
-                onClick={onSecondaryClick}
+                onClick={(e) => {
+                  if (description && (showFullDescription || !onSecondaryClick)) {
+                    setShowFullDescription(!showFullDescription);
+                    return;
+                  }
+                  onSecondaryClick?.();
+                }}
                 className={cn(
                   "flex-1 bg-gray-50 text-gray-400 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all border border-gray-100",
                   "hover:bg-gray-100 hover:text-black active:scale-95 duration-300"
                 )}
               >
-                {secondaryButtonText}
+                {showFullDescription ? 'Hide' : (secondaryButtonText || 'Details')}
               </button>
             )}
             <button

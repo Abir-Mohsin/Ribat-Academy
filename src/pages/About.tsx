@@ -65,18 +65,18 @@ export function About() {
       </section>
 
       {/* Stats/Values Grid */}
-      <section className="bg-gray-50 py-24 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <section className="bg-gray-50 py-16 lg:py-24 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           {values.map((v, i) => (
             <motion.div 
               key={i} 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="flex flex-col items-center text-center"
+              className="flex flex-col items-center text-center p-6 bg-white sm:bg-transparent rounded-3xl sm:rounded-none shadow-sm sm:shadow-none border border-gray-100 sm:border-none"
             >
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white sm:bg-gray-100/50 rounded-2xl shadow-sm sm:shadow-none border border-gray-100 flex items-center justify-center mb-6">
                 <v.icon className="text-[#0EA5E9]" size={28} />
               </div>
               <h3 className="text-lg font-bold mb-3" dangerouslySetInnerHTML={{ __html: v.title }} />
@@ -87,24 +87,24 @@ export function About() {
       </section>
 
       {/* Founders/Instructors */}
-      <section className="py-32 px-4">
+      <section className="py-24 lg:py-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl font-bold mb-4">Our Instructors</h2>
+          <div className="text-center mb-16 lg:mb-20">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Our Instructors</h2>
             <p className="text-gray-500">Learn from the best in the field.</p>
           </div>
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-12">
             {instructors.length > 0 ? (
               instructors.map((instructor, idx) => (
                 <motion.div 
                   key={instructor.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="text-center group"
+                  className="text-center group bg-white p-8 rounded-[40px] border border-gray-50 hover:border-blue-100 transition-colors"
                 >
-                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-500 border-4 border-white shadow-xl">
+                  <div className="w-40 h-40 lg:w-48 lg:h-48 mx-auto rounded-full overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-500 border-4 border-white shadow-xl">
                     <img src={instructor.image || `https://images.unsplash.com/photo-1544217121-dca9cb6ad021?auto=format&fit=crop&w=300`} alt={instructor.name} className="w-full h-full object-cover" />
                   </div>
                   <h4 className="text-xl font-bold">{instructor.name}</h4>
@@ -113,9 +113,9 @@ export function About() {
                 </motion.div>
               ))
             ) : (
-              [1, 2, 3].map(i => (
+              [1, 2, 3, 4].map(i => (
                 <div key={i} className="text-center opacity-30">
-                  <div className="w-48 h-48 mx-auto rounded-full bg-gray-100 mb-6" />
+                  <div className="w-40 h-40 lg:w-48 lg:h-48 mx-auto rounded-full bg-gray-100 mb-6" />
                   <div className="h-6 w-32 bg-gray-100 mx-auto mb-2 rounded" />
                   <div className="h-4 w-24 bg-gray-100 mx-auto rounded" />
                 </div>

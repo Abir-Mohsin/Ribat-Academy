@@ -16,6 +16,7 @@ import { AdminPanel } from './pages/AdminPanel';
 import { CoursePlayer } from './pages/CoursePlayer';
 import { CustomPage } from './pages/CustomPage';
 import { CourseDetails } from './pages/CourseDetails';
+import { BookDetails } from './pages/BookDetails';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ScrollToTop } from './components/ScrollToTop';
 
@@ -56,14 +57,15 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white overflow-hidden">
       <Navbar />
-      <main className="flex-grow">
+      <main className="flex-grow relative w-full overflow-x-hidden">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CourseDetails />} />
           <Route path="/books" element={<Books />} />
+          <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/enroll" element={<CustomPage type="enroll" title="How to Enroll" />} />
           <Route path="/faq" element={<CustomPage type="faq" title="Frequently Asked Questions" />} />

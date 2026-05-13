@@ -36,6 +36,8 @@ interface Book {
   price: number;
   coverImage: string;
   author: string;
+  authorBio?: string;
+  gallery?: string[];
   bookType: 'hardcover' | 'pdf';
   fileUrl?: string;
   status: 'draft' | 'published';
@@ -245,15 +247,34 @@ export function BookManager() {
                   placeholder="https://..."
                 />
               </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
-                <RichTextEditor 
-                  value={editingBook?.description || ''}
-                  onChange={content => setEditingBook({...editingBook, description: content})}
-                  placeholder="Book summary..."
-                  className="h-[300px] mb-16"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
+              <RichTextEditor 
+                value={editingBook?.description || ''}
+                onChange={content => setEditingBook({...editingBook, description: content})}
+                placeholder="Book summary..."
+                className="h-[200px] mb-12"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Author Bio (লেখক পরিচিতি)</label>
+              <RichTextEditor 
+                value={editingBook?.authorBio || ''}
+                onChange={content => setEditingBook({...editingBook, authorBio: content})}
+                placeholder="About the author..."
+                className="h-[200px] mb-12"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Gallery Images (বইয়ের ভেতরের ছবি - Comma separated URLs)</label>
+              <textarea 
+                value={editingBook?.gallery?.join(', ') || ''}
+                onChange={e => setEditingBook({...editingBook, gallery: e.target.value.split(',').map(s => s.trim()).filter(s => s !== '')})}
+                className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans"
+                placeholder="URL 1, URL 2, URL 3..."
+                rows={3}
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">

@@ -327,7 +327,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       
       // Update content without losing cursor position
       const isFocused = editor.isFocused;
-      editor.commands.setContent(value, false, { preserveWhitespace: 'full' });
+      editor.commands.setContent(value);
       if (isFocused) editor.commands.focus();
     }
   }, [value, editor]);
