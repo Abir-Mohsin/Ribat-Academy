@@ -101,7 +101,7 @@ export function BookDetails() {
 
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
           {/* Left/Col 1: Images */}
-          <div className="order-1 w-full space-y-6">
+          <div className="w-full space-y-6">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ export function BookDetails() {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="order-3 lg:order-2 w-full space-y-8"
+            className="w-full space-y-8"
           >
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
@@ -248,7 +248,7 @@ export function BookDetails() {
           </motion.div>
 
           {/* Video Trailer placed here for grid ordering */}
-          <div className="order-2 lg:order-3 w-full">
+          <div className="w-full">
             {book.videoUrl && (
               <div className="w-full">
                 <h3 className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-4 flex items-center gap-2">
@@ -266,7 +266,7 @@ export function BookDetails() {
             )}
           </div>
 
-          <div className="order-4 lg:order-4 w-full">
+          <div className="w-full">
             {/* Author Section */}
             {book.authorBio && (
               <div className="h-full">
