@@ -279,7 +279,7 @@ export function LiveClassManager() {
                   <div className="flex items-center gap-4">
                     <div className="w-16 aspect-video bg-gray-100 rounded-lg overflow-hidden shrink-0">
                       {item.thumbnail ? (
-                        <img src={getThumbnailUrl(item.thumbnail)} className="w-full h-full object-cover" />
+                        <img referrerPolicy="no-referrer" src={getThumbnailUrl(item.thumbnail)} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20} /></div>
                       )}

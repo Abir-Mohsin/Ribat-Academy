@@ -11,6 +11,7 @@ import { Home } from './pages/Home';
 import { Courses } from './pages/Courses';
 import { Books } from './pages/Books';
 import { About } from './pages/About';
+import { InstructorDetails } from './pages/InstructorDetails';
 import { Dashboard } from './pages/Dashboard';
 import { AdminPanel } from './pages/AdminPanel';
 import { CoursePlayer } from './pages/CoursePlayer';
@@ -57,7 +58,7 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-white overflow-hidden pb-16 md:pb-0">
       <Navbar />
       <main className="flex-grow relative w-full overflow-x-hidden">
         <Routes>
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/about" element={<About />} />
+          <Route path="/instructor/:id" element={<InstructorDetails />} />
           <Route path="/enroll" element={<CustomPage type="enroll" title="How to Enroll" />} />
           <Route path="/faq" element={<CustomPage type="faq" title="Frequently Asked Questions" />} />
           <Route path="/privacy" element={<CustomPage type="privacy" title="Privacy Policy" />} />

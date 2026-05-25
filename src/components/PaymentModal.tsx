@@ -22,7 +22,7 @@ interface PaymentModalProps {
     title: string;
     price: number;
     type: 'course' | 'book' | 'live_class';
-    bookType?: 'hardcover' | 'pdf';
+    purchaseType?: 'hardcover' | 'pdf';
   };
 }
 
@@ -84,9 +84,10 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
         itemTitle: item.title,
         amount: Number(item.price),
         trxId: isCod ? 'COD' : trxId.trim(),
-        shippingAddress: (item.bookType === 'hardcover' ? shippingAddress.trim() : null),
-        buyerName: (item.bookType === 'hardcover' ? buyerName.trim() : null),
-        mobileNumber: (item.bookType === 'hardcover' ? mobileNumber.trim() : null),
+        purchaseType: item.purchaseType || null,
+        shippingAddress: (item.purchaseType === 'hardcover' ? shippingAddress.trim() : null),
+        buyerName: (item.purchaseType === 'hardcover' ? buyerName.trim() : null),
+        mobileNumber: (item.purchaseType === 'hardcover' ? mobileNumber.trim() : null),
         paymentMethod: isCod ? 'cod' : 'manual',
         status: isCod ? 'pending' : 'pending',
         createdAt: serverTimestamp(),
@@ -135,10 +136,11 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
         itemTitle: item.title,
         amount: item.price,
         status: 'approved', // Auto-approve for card payments
+        purchaseType: item.purchaseType || null,
         paymentMethod: 'stripe',
-        shippingAddress: item.bookType === 'hardcover' ? shippingAddress : null,
-        buyerName: item.bookType === 'hardcover' ? buyerName : null,
-        mobileNumber: item.bookType === 'hardcover' ? mobileNumber : null,
+        shippingAddress: item.purchaseType === 'hardcover' ? shippingAddress : null,
+        buyerName: item.purchaseType === 'hardcover' ? buyerName : null,
+        mobileNumber: item.purchaseType === 'hardcover' ? mobileNumber : null,
         createdAt: serverTimestamp(),
       });
       
@@ -257,7 +259,7 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                       <div className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center group-hover:border-white"><div className="w-2 h-2 bg-[#0EA5E9] rounded-full opacity-0 group-hover:opacity-100"></div></div>
                     </button>
 
-                    {item.bookType === 'hardcover' && (
+                    {item.purchaseType === 'hardcover' && (
                       <button 
                         onClick={() => setMethod('cod')}
                         className="w-full flex items-center justify-between p-6 bg-gray-50 hover:bg-black hover:text-white rounded-2xl border border-gray-100 transition-all group"
@@ -291,7 +293,7 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                     <p className="text-gray-500 text-sm">Secure payment powered by Stripe.</p>
                   </header>
 
-                  {item.bookType === 'hardcover' && (
+                  {item.purchaseType === 'hardcover' && (
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-3">Buyer Name</label>
@@ -328,7 +330,7 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                     </div>
                   )}
                   
-                  {clientSecret && (!item.bookType || item.bookType !== 'hardcover' || shippingAddress.length > 5) && (
+                  {clientSecret && (!item.purchaseType || item.purchaseType !== 'hardcover' || shippingAddress.length > 5) && (
                     <Elements stripe={stripePromise} options={{ clientSecret }}>
                       <StripePaymentForm 
                         amount={item.price} 
@@ -337,7 +339,7 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                       />
                     </Elements>
                   )}
-                  {item.bookType === 'hardcover' && shippingAddress.length <= 5 && (
+                  {item.purchaseType === 'hardcover' && shippingAddress.length <= 5 && (
                     <p className="text-xs text-amber-600 font-medium bg-amber-50 p-3 rounded-lg flex items-center gap-2">
                        <Info size={14} /> Please enter your shipping address to proceed.
                     </p>
@@ -375,7 +377,7 @@ export function PaymentModal({ isOpen, onClose, item }: PaymentModalProps) {
                         <X size={14} /> {error}
                       </div>
                     )}
-                    {item.bookType === 'hardcover' && (
+                    {item.purchaseType === 'hardcover' && (
                       <div className="space-y-4">
                         <div>
                           <label className="block text-xs font-bold text-gray-400 uppercase mb-3">Buyer Name</label>

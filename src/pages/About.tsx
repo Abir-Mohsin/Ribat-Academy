@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { GraduationCap, Target, Heart, Award, Loader2 } from 'lucide-react';
 import { collection, getDocs, getDoc, doc, query, orderBy } from 'firebase/firestore';
 import { db } from '@/src/lib/firebase';
+import { getDownloadUrl } from '@/src/lib/drive';
 
 export function About() {
   const [instructors, setInstructors] = useState<any[]>([]);
@@ -96,21 +98,22 @@ export function About() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 lg:gap-12">
             {instructors.length > 0 ? (
               instructors.map((instructor, idx) => (
-                <motion.div 
-                  key={instructor.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="text-center group bg-white p-8 rounded-[40px] border border-gray-50 hover:border-blue-100 transition-colors"
-                >
-                  <div className="w-40 h-40 lg:w-48 lg:h-48 mx-auto rounded-full overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-500 border-4 border-white shadow-xl">
-                    <img src={instructor.image || `https://images.unsplash.com/photo-1544217121-dca9cb6ad021?auto=format&fit=crop&w=300`} alt={instructor.name} className="w-full h-full object-cover" />
-                  </div>
-                  <h4 className="text-xl font-bold">{instructor.name}</h4>
-                  <p className="text-sm text-[#0EA5E9] font-medium mb-4">{instructor.role}</p>
-                  <div className="text-sm text-gray-500 px-4 line-clamp-3 break-words" dangerouslySetInnerHTML={{ __html: instructor.bio || 'No bio available.' }} />
-                </motion.div>
+                <Link to={`/instructor/${instructor.id}`} key={instructor.id}>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="text-center group bg-white p-8 rounded-[40px] border border-gray-50 hover:border-blue-100 transition-colors h-full"
+                  >
+                    <div className="w-40 h-40 lg:w-48 lg:h-48 mx-auto rounded-full overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-500 border-4 border-white shadow-xl">
+                      <img referrerPolicy="no-referrer" src={getDownloadUrl(instructor.image) || `https://images.unsplash.com/photo-1544217121-dca9cb6ad021?auto=format&fit=crop&w=300`} alt={instructor.name} className="w-full h-full object-cover" />
+                    </div>
+                    <h4 className="text-xl font-bold">{instructor.name}</h4>
+                    <p className="text-sm text-[#0EA5E9] font-medium mb-4">{instructor.role}</p>
+                    <div className="text-sm text-gray-500 px-4 line-clamp-3 break-words" dangerouslySetInnerHTML={{ __html: instructor.bio || 'No bio available.' }} />
+                  </motion.div>
+                </Link>
               ))
             ) : (
               [1, 2, 3, 4].map(i => (

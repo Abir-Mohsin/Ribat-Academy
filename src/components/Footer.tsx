@@ -1,18 +1,36 @@
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getDownloadUrl } from '@/src/lib/drive';
+import { useState, useEffect } from 'react';
+import { onSnapshot, doc } from 'firebase/firestore';
+import { db } from '@/src/lib/firebase';
 
 export function Footer() {
+  const [logoUrl, setLogoUrl] = useState("https://drive.google.com/file/d/12XB27N6Taj_Ljm8kbnUdsjuSCJDGn-63/view?usp=drive_link");
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'general'), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().siteLogo) {
+        setLogoUrl(docSnap.data().siteLogo);
+      }
+    });
+    return unsub;
+  }, []);
+
   return (
     <footer className="bg-[var(--color-footer-bg)] border-t border-[var(--color-footer-bg)] text-[var(--color-footer-text)] pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand */}
         <div className="md:col-span-1">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-[var(--color-footer-bg)] font-bold text-lg">R</span>
+          <Link to="/" className="flex items-center group transition-transform active:scale-95 mb-6">
+            <div className="h-10 sm:h-12 overflow-hidden shrink-0 flex items-center justify-center">
+               <img referrerPolicy="no-referrer" 
+                 src={getDownloadUrl(logoUrl)} 
+                 alt="Ribat Academy Logo" 
+                 className="w-auto h-full object-contain"
+                 />
             </div>
-            <span className="font-bold text-xl text-[var(--color-footer-text)]">Ribat Academy</span>
-          </div>
+          </Link>
           <p className="text-[var(--color-footer-text)] opacity-80 text-sm leading-relaxed mb-6">
             Empowering students with Islamic wisdom and modern skills. Quality education accessible to everyone, everywhere.
           </p>

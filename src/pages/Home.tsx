@@ -106,12 +106,11 @@ export function Home() {
         {/* Background Image Layer */}
         {(settings?.heroBackgroundImage || (heroImages.length > 0 && heroImages[0])) && (
           <div className="absolute inset-0 z-0 select-none">
-            <img 
+            <img referrerPolicy="no-referrer" 
               src={getDownloadUrl(settings?.heroBackgroundImage || heroImages[0]) || undefined} 
               className="w-full h-full object-cover opacity-10 pointer-events-none" 
               alt="Hero Background"
-              referrerPolicy="no-referrer"
-            />
+              />
           </div>
         )}
 
@@ -364,7 +363,7 @@ export function Home() {
               books.map((book) => (
                 <Link key={book.id} to="/books" className="group">
                   <div className="aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-gray-50 border border-gray-100 shadow-sm relative transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-blue-200/50 group-hover:-translate-y-2">
-                    <img src={book.coverImage ? getThumbnailUrl(book.coverImage) : (book.image ? getThumbnailUrl(book.image) : 'https://images.unsplash.com/photo-1544640808-32ca72ac7f67?auto=format&fit=crop&q=80')} alt={book.title} className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={book.coverImage ? getThumbnailUrl(book.coverImage) : (book.image ? getThumbnailUrl(book.image) : 'https://images.unsplash.com/photo-1544640808-32ca72ac7f67?auto=format&fit=crop&q=80')} alt={book.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                       <Button size="sm" className="w-full bg-white text-black hover:bg-gray-100">Buy Now</Button>
                     </div>
@@ -403,11 +402,10 @@ export function Home() {
               <div key={review.id} className="w-[130px] sm:w-[220px] shrink-0 aspect-[9/16] bg-white rounded-[1.2rem] sm:rounded-[2.2rem] p-1.5 sm:p-3 border border-gray-100 flex flex-col relative group overflow-hidden shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)]">
                  {/* Internal Image Wrap */}
                  <div className="relative flex-grow rounded-[0.8rem] sm:rounded-[1.6rem] overflow-hidden group cursor-pointer bg-gray-50">
-                    <img 
+                    <img referrerPolicy="no-referrer" 
                       src={review.thumbnail || `https://images.unsplash.com/photo-1544640808-32ca72ac7f67?auto=format&fit=crop&w=400`} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                      referrerPolicy="no-referrer"
-                    />
+                      />
                     
                     <a 
                       href={review.videoUrl} 
@@ -426,11 +424,10 @@ export function Home() {
                  {/* Card Footer: Student Info */}
                  <div className="pt-3 pb-1.5 px-1.5 flex items-center gap-2">
                     <div className="w-6 h-6 sm:w-11 sm:h-11 rounded-full border border-gray-100 p-0.5 overflow-hidden shrink-0">
-                       <img 
+                       <img referrerPolicy="no-referrer" 
                         src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} 
                         className="w-full h-full rounded-full object-cover" 
-                        referrerPolicy="no-referrer"
-                       />
+                        />
                     </div>
                     <div className="min-w-0">
                        <p className="font-bold text-gray-900 text-[9px] sm:text-[13px] truncate tracking-tight">{review.name}</p>
@@ -443,12 +440,11 @@ export function Home() {
             {videoReviews.map((review) => (
               <div key={`${review.id}-dup`} className="w-[130px] sm:w-[220px] shrink-0 aspect-[9/16] bg-white rounded-[1.2rem] sm:rounded-[2.2rem] p-1.5 sm:p-3 border border-gray-100 flex flex-col relative group overflow-hidden shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)]">
                  <div className="relative flex-grow rounded-[0.8rem] sm:rounded-[1.6rem] overflow-hidden group cursor-pointer bg-gray-50">
-                    <img 
+                    <img referrerPolicy="no-referrer" 
                       src={review.thumbnail || `https://images.unsplash.com/photo-1544640808-32ca72ac7f67?auto=format&fit=crop&w=400`} 
                       alt="Review thumbnail" 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                      referrerPolicy="no-referrer"
-                    />
+                      />
                     <a 
                       href={review.videoUrl} 
                       target="_blank" 
@@ -464,11 +460,10 @@ export function Home() {
                  </div>
                  <div className="pt-3 pb-1.5 px-1.5 flex items-center gap-2">
                     <div className="w-6 h-6 sm:w-11 sm:h-11 rounded-full border border-gray-100 p-0.5 overflow-hidden shrink-0">
-                       <img 
+                       <img referrerPolicy="no-referrer" 
                         src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} 
                         className="w-full h-full rounded-full object-cover" 
-                        referrerPolicy="no-referrer"
-                       />
+                        />
                     </div>
                     <div className="min-w-0">
                        <p className="font-bold text-gray-900 text-[9px] sm:text-[13px] truncate tracking-tight">{review.name}</p>
@@ -503,7 +498,7 @@ export function Home() {
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 overflow-hidden border border-gray-50">
-                    <img src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-xs sm:text-sm truncate">{t.name}</p>
@@ -526,7 +521,7 @@ export function Home() {
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 overflow-hidden border border-gray-50">
-                    <img src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={t.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-xs sm:text-sm truncate">{t.name}</p>

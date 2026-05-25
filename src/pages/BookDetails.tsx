@@ -20,6 +20,19 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+const getEmbedUrl = (url: string) => {
+  if (!url) return '';
+  if (url.includes('youtube.com/watch?v=')) {
+    const videoId = url.split('v=')[1].split('&')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1].split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return url;
+};
+
 export function BookDetails() {
   const { id } = useParams<{ id: string }>();
   const [book, setBook] = useState<any>(null);
@@ -45,12 +58,12 @@ export function BookDetails() {
     fetchBook();
   }, [id]);
 
-  const handlePurchase = () => {
+  const handlePurchase = (purchaseType: string, price: number) => {
     if (!user) {
       signInWithGoogle();
       return;
     }
-    setSelectedBookForPurchase(book);
+    setSelectedBookForPurchase({ ...book, type: 'book', purchaseType, price });
   };
 
   if (loading) {
@@ -138,11 +151,10 @@ export function BookDetails() {
                       currentImageIndex === index ? "border-black scale-95" : "border-transparent opacity-60 hover:opacity-100"
                     )}
                   >
-                    <img 
+                    <img referrerPolicy="no-referrer" 
                       src={getThumbnailUrl(img)} 
                       className="w-full h-full object-cover" 
-                      referrerPolicy="no-referrer"
-                    />
+                      />
                   </button>
                 ))}
               </div>
@@ -177,19 +189,54 @@ export function BookDetails() {
               </div>
             </div>
 
-            <div className="text-3xl font-black tracking-tight text-black flex items-baseline gap-2">
-              ৳{book.price}
-              {book.oldPrice && <span className="text-xl text-gray-300 line-through font-bold">৳{book.oldPrice}</span>}
+            <div className="flex flex-col gap-4">
+              {book.hasPdf && (
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
+                  <div className="flex flex-col items-center sm:items-start w-full">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#0EA5E9] mb-1">PDF Version</span>
+                    <div className="text-2xl font-black text-black">৳{book.pdfPrice}</div>
+                    <span className="text-[10px] font-medium text-gray-500">Read instantly on your dashboard</span>
+                  </div>
+                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase('pdf', book.pdfPrice)}>
+                    <ShoppingCart size={20} />
+                    Buy PDF
+                  </Button>
+                </div>
+              )}
+              
+              {book.hasHardcover && (
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
+                  <div className="flex flex-col items-center sm:items-start w-full">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Hardcover</span>
+                    <div className="text-2xl font-black text-black">৳{book.hardcoverPrice}</div>
+                    <span className="text-[10px] font-medium text-gray-500">Physical book delivered to your address</span>
+                  </div>
+                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase('hardcover', book.hardcoverPrice)}>
+                    <ShoppingCart size={20} />
+                    Buy Hardcover
+                  </Button>
+                </div>
+              )}
+
+              {!book.hasPdf && !book.hasHardcover && book.price !== undefined && (
+                 <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
+                  <div className="flex flex-col items-center sm:items-start w-full">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Standard Version</span>
+                    <div className="text-2xl font-black text-black">৳{book.price}</div>
+                  </div>
+                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase(book.bookType || 'pdf', book.price)}>
+                    <ShoppingCart size={20} />
+                    Buy Now
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="w-full sm:w-auto gap-2 px-12" onClick={handlePurchase}>
-                <ShoppingCart size={20} />
-                Buy Now
-              </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2">
-                <Share2 size={20} />
-                Share
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <Button size="lg" variant="outline" className="w-full gap-2 text-gray-400 font-bold tracking-widest uppercase text-xs" onClick={() => {
+                if (navigator.share) navigator.share({ title: book.title, url: window.location.href });
+              }}>
+                <Share2 size={16} /> Share
               </Button>
             </div>
 
@@ -219,6 +266,21 @@ export function BookDetails() {
           </motion.div>
         </div>
 
+        {/* Video Trailer */}
+        {book.videoUrl && (
+          <div className="mt-20 pt-16 border-t border-gray-100">
+            <h3 className="text-xl font-bold mb-8">Book Trailer</h3>
+            <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
+              <iframe 
+                src={getEmbedUrl(book.videoUrl)}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        )}
+
         {/* Gallery Preview Below (As requested "বইয়ের নিচে কিছু ছবি যুক্ত করা থাকবে") */}
         {gallery.length > 0 && (
           <div className="mt-24 pt-20 border-t border-gray-100">
@@ -233,12 +295,11 @@ export function BookDetails() {
                   whileHover={{ y: -5 }}
                   className="aspect-[3/4] bg-gray-100 rounded-3xl overflow-hidden shadow-xl border border-gray-100"
                 >
-                  <img 
+                  <img referrerPolicy="no-referrer" 
                     src={getThumbnailUrl(img)} 
                     alt={`Preview ${i + 1}`} 
                     className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+                    />
                 </motion.div>
               ))}
             </div>

@@ -411,7 +411,7 @@ export function CourseManager() {
                     <div className="flex items-center gap-4">
                       <div className="w-20 aspect-video bg-gray-100 rounded-lg overflow-hidden shrink-0 shadow-sm border border-gray-100">
                         {course.thumbnail ? (
-                          <img src={getThumbnailUrl(course.thumbnail)} className="w-full h-full object-cover" />
+                          <img referrerPolicy="no-referrer" src={getThumbnailUrl(course.thumbnail)} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20} /></div>
                         )}

@@ -33,13 +33,20 @@ interface Book {
   id?: string;
   title: string;
   description: string;
-  price: number;
   coverImage: string;
   author: string;
   authorBio?: string;
   gallery?: string[];
-  bookType: 'hardcover' | 'pdf';
+  
+  hasPdf: boolean;
+  pdfPrice: number;
   fileUrl?: string;
+
+  hasHardcover: boolean;
+  hardcoverPrice: number;
+  
+  videoUrl?: string;
+
   status: 'draft' | 'published';
   createdAt?: any;
 }
@@ -170,73 +177,60 @@ export function BookManager() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Book Type</label>
-                  <select 
-                    value={editingBook?.bookType || 'pdf'}
-                    onChange={e => setEditingBook({...editingBook, bookType: e.target.value as any})}
-                    className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans"
-                    required
-                  >
-                    <option value="pdf">PDF (Digital)</option>
-                    <option value="hardcover">Hardcover (Physical)</option>
-                  </select>
+              </div>
+
+              <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-gray-900">PDF Version</h4>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={editingBook?.hasPdf || false} onChange={e => setEditingBook({...editingBook, hasPdf: e.target.checked})} />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                  </label>
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Price (BDT)</label>
-                <input 
-                  type="number" 
-                  value={editingBook?.price || ''}
-                  onChange={e => setEditingBook({...editingBook, price: parseFloat(e.target.value)})}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans"
-                  required
-                />
-              </div>
-              {editingBook?.bookType === 'pdf' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">PDF File Source</label>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="relative group">
-                        <input 
-                          type="file" 
-                          accept="application/pdf"
-                          onChange={handlePdfUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          disabled={uploadingPdf}
-                        />
-                        <div className="w-full py-6 border-2 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center gap-2 bg-gray-50/50 group-hover:bg-gray-50 transition-colors">
-                          {uploadingPdf ? (
-                            <Loader2 className="animate-spin text-[#0EA5E9]" size={24} />
-                          ) : (
-                            <Upload className="text-gray-400" size={24} />
-                          )}
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                            {uploadingPdf ? "Uploading..." : "Click to upload PDF file"}
-                          </p>
+                {editingBook?.hasPdf && (
+                  <div className="space-y-4 pt-4 border-t border-gray-200">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2">PDF Price (BDT)</label>
+                      <input type="number" value={editingBook?.pdfPrice || ''} onChange={e => setEditingBook({...editingBook, pdfPrice: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-white rounded-xl focus:outline-none border border-gray-100" required={editingBook.hasPdf} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2">PDF File Source</label>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="relative group">
+                          <input type="file" accept="application/pdf" onChange={handlePdfUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={uploadingPdf} />
+                          <div className="w-full py-6 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 bg-white group-hover:bg-gray-50 transition-colors">
+                            {uploadingPdf ? <Loader2 className="animate-spin text-[#0EA5E9]" size={24} /> : <Upload className="text-gray-400" size={24} />}
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{uploadingPdf ? "Uploading..." : "Click to upload PDF file"}</p>
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase">OR</div>
+                          <input type="text" value={editingBook?.fileUrl || ''} onChange={e => setEditingBook({...editingBook, fileUrl: e.target.value})} className="w-full pl-12 pr-4 py-3 bg-white rounded-xl focus:outline-none border border-gray-100 text-sm" placeholder="Paste PDF URL" />
                         </div>
                       </div>
-                      
-                      <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase">OR</div>
-                        <input 
-                          type="text" 
-                          value={editingBook?.fileUrl || ''}
-                          onChange={e => setEditingBook({...editingBook, fileUrl: e.target.value})}
-                          className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans text-sm"
-                          placeholder="Paste PDF URL (e.g. Google Drive link)"
-                        />
-                      </div>
+                      {editingBook?.fileUrl && <p className="mt-2 text-[10px] text-green-600 font-bold flex items-center gap-1"><Tag size={10} /> File linked</p>}
                     </div>
-                    {editingBook?.fileUrl && (
-                      <p className="mt-2 text-[10px] text-green-600 font-bold flex items-center gap-1">
-                        <Tag size={10} /> File linked: {editingBook.fileUrl.substring(0, 50)}...
-                      </p>
-                    )}
                   </div>
+                )}
+              </div>
+
+              <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-gray-900">Hardcover Version</h4>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={editingBook?.hasHardcover || false} onChange={e => setEditingBook({...editingBook, hasHardcover: e.target.checked})} />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                  </label>
                 </div>
-              )}
+                {editingBook?.hasHardcover && (
+                  <div className="space-y-4 pt-4 border-t border-gray-200">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Hardcover Price (BDT)</label>
+                      <input type="number" value={editingBook?.hardcoverPrice || ''} onChange={e => setEditingBook({...editingBook, hardcoverPrice: parseFloat(e.target.value)})} className="w-full px-4 py-3 bg-white rounded-xl focus:outline-none border border-gray-100" required={editingBook.hasHardcover} />
+                    </div>
+                  </div>
+                )}
+              </div>
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Cover Image URL</label>
                 <input 
@@ -275,6 +269,16 @@ export function BookManager() {
                 rows={3}
               />
             </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Video Link (e.g. YouTube URL)</label>
+              <input 
+                type="text" 
+                value={editingBook?.videoUrl || ''}
+                onChange={e => setEditingBook({...editingBook, videoUrl: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none border border-gray-100 font-sans"
+                placeholder="https://youtube.com/watch?v=..."
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
@@ -306,10 +310,12 @@ export function BookManager() {
            setEditingBook({
              title: '',
              description: '',
-             price: 0,
              author: '',
              coverImage: '',
-             bookType: 'pdf',
+             hasPdf: true,
+             pdfPrice: 0,
+             hasHardcover: false,
+             hardcoverPrice: 0,
              status: 'draft'
            });
            setIsEditing(true);
@@ -323,8 +329,8 @@ export function BookManager() {
           <thead>
             <tr className="bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
               <th className="px-6 py-4">Title & Author</th>
-              <th className="px-6 py-4">Type</th>
-              <th className="px-6 py-4">Price</th>
+              <th className="px-6 py-4">Versions</th>
+              <th className="px-6 py-4">Prices</th>
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">Actions</th>
             </tr>
@@ -342,7 +348,7 @@ export function BookManager() {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-16 bg-gray-100 rounded overflow-hidden shrink-0">
                       {book.coverImage ? (
-                        <img src={getThumbnailUrl(book.coverImage)} className="w-full h-full object-cover" />
+                        <img referrerPolicy="no-referrer" src={getThumbnailUrl(book.coverImage)} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300"><BookIcon size={20} /></div>
                       )}
@@ -354,12 +360,16 @@ export function BookManager() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-[10px] font-bold uppercase text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                    {book.bookType || 'pdf'}
-                  </span>
+                  <div className="flex gap-2">
+                    {book.hasPdf && <span className="text-[10px] font-bold uppercase text-gray-500 bg-gray-100 px-2 py-0.5 rounded">PDF</span>}
+                    {book.hasHardcover && <span className="text-[10px] font-bold uppercase text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Hardcover</span>}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="font-bold text-sm text-sans tracking-tight">৳{book.price}</span>
+                  <div className="flex flex-col gap-1">
+                    {book.hasPdf && <span className="font-bold text-xs text-sans tracking-tight text-gray-600">PDF: ৳{book.pdfPrice}</span>}
+                    {book.hasHardcover && <span className="font-bold text-xs text-sans tracking-tight text-gray-600">HC: ৳{book.hardcoverPrice}</span>}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
                   <button 

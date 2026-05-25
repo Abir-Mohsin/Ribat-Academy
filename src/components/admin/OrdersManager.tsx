@@ -33,6 +33,7 @@ interface Order {
   userId: string;
   userEmail: string;
   itemType: 'course' | 'book';
+  purchaseType?: string;
   itemId: string;
   itemTitle: string;
   amount: number;
@@ -150,7 +151,7 @@ export function OrdersManager() {
                       <div className="aspect-video bg-gray-50 rounded-xl overflow-hidden border border-gray-100 relative group">
                          {order.paymentScreenshot ? (
                            <>
-                             <img src={getThumbnailUrl(order.paymentScreenshot)} alt="Proof" className="w-full h-full object-cover" />
+                             <img referrerPolicy="no-referrer" src={getThumbnailUrl(order.paymentScreenshot)} alt="Proof" className="w-full h-full object-cover" />
                              <a 
                               href={order.paymentScreenshot} 
                               target="_blank" 
@@ -192,7 +193,7 @@ export function OrdersManager() {
                                "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase",
                                order.itemType === 'course' ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
                              )}>
-                               {order.itemType}
+                               {order.itemType} {order.purchaseType ? `(${order.purchaseType})` : ''}
                              </span>
                           </div>
                           <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-gray-400 font-sans font-medium">

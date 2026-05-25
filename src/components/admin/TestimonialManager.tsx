@@ -118,7 +118,7 @@ export function TestimonialManager() {
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                  {t.avatar ? <img src={t.avatar} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-400" />}
+                  {t.avatar ? <img referrerPolicy="no-referrer" src={t.avatar} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-400" />}
                 </div>
                 <div>
                   <h4 className="font-bold text-sm">{t.name}</h4>

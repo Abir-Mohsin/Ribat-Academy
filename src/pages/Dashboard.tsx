@@ -324,7 +324,7 @@ export function Dashboard() {
                         {myCourses.filter(c => c.progress > 0 && c.progress < 100).map(course => (
                           <div key={course.id} className="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-[24px] border border-gray-50 bg-gray-50/50 hover:bg-white hover:border-gray-100 hover:shadow-sm transition-all duration-300">
                              <div className="w-full sm:w-40 aspect-video rounded-xl overflow-hidden shadow-sm shrink-0">
-                               <img src={getThumbnailUrl(course.image)} alt={course.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                               <img referrerPolicy="no-referrer" src={getThumbnailUrl(course.image)} alt={course.title} className="w-full h-full object-cover" />
                              </div>
                              <div className="flex-grow w-full">
                                 <h4 className="font-bold text-lg mb-3 tracking-tight">{course.title}</h4>
@@ -388,7 +388,7 @@ export function Dashboard() {
                   {myLiveClasses.map(liveClass => (
                     <div key={liveClass.id} className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all duration-300">
                       <div className="aspect-video relative">
-                        <img src={getThumbnailUrl(liveClass.thumbnail)} alt={liveClass.title} className="w-full h-full object-cover" />
+                        <img referrerPolicy="no-referrer" src={getThumbnailUrl(liveClass.thumbnail)} alt={liveClass.title} className="w-full h-full object-cover" />
                         <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                           <Video size={12} />
                           Live Class
@@ -426,13 +426,17 @@ export function Dashboard() {
                   {myBooks.map(book => (
                     <div key={book.id} className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all duration-300">
                       <div className="aspect-[3/4] relative bg-gray-50 p-4 shrink-0">
-                        <img src={getThumbnailUrl(book.coverImage || book.thumbnail)} alt={book.title || book.itemTitle} className="w-full h-full object-cover rounded-xl shadow-md" />
+                        <img referrerPolicy="no-referrer" src={getThumbnailUrl(book.coverImage || book.thumbnail)} alt={book.title || book.itemTitle} className="w-full h-full object-cover rounded-xl shadow-md" />
                       </div>
                       <div className="p-6 flex flex-col flex-grow text-center">
                         <h4 className="font-bold text-lg mb-2">{book.title || book.itemTitle}</h4>
                         {book.author && <p className="text-sm text-gray-500 mb-6">{book.author}</p>}
                         <div className="mt-auto">
-                          {book.fileUrl || book.pdfFile || book.downloadUrl ? (
+                          {(book.purchaseType === 'hardcover' || book.shippingAddress) ? (
+                            <div className="bg-amber-50 text-amber-700 p-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-amber-100">
+                              <Bookmark size={14} /> Preparing for Delivery
+                            </div>
+                          ) : (book.fileUrl || book.pdfFile || book.downloadUrl) ? (
                             <a href={book.fileUrl || book.pdfFile || getDownloadUrl(book.downloadUrl)} target="_blank" rel="noreferrer" className="block w-full">
                               <Button fullWidth className="gap-2 shrink-0">
                                 {(book.fileUrl || book.pdfFile) ? (

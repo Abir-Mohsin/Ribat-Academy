@@ -101,7 +101,7 @@ export function VideoReviewManager() {
         ) : reviews.map(r => (
           <div key={r.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group">
             <div className="aspect-video relative overflow-hidden">
-               <img src={r.thumbnail} alt={r.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+               <img referrerPolicy="no-referrer" src={r.thumbnail} alt={r.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                   <PlayCircle className="text-white opacity-80" size={32} />
                </div>

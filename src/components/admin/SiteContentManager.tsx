@@ -15,6 +15,7 @@ import { db, handleFirestoreError, OperationType } from '@/src/lib/firebase';
 import { RichTextEditor } from '@/src/components/RichTextEditor';
 import { Button } from '@/src/components/Button';
 import { cn } from '@/src/lib/utils';
+import { getDownloadUrl } from '@/src/lib/drive';
 
 interface Instructor {
   id: string;
@@ -23,6 +24,9 @@ interface Instructor {
   bio: string;
   image: string;
   order: number;
+  facebookUrl?: string;
+  twitterUrl?: string;
+  websiteUrl?: string;
 }
 
 interface SiteSettings {
@@ -58,6 +62,7 @@ interface SiteSettings {
   pageEnrollContent?: string;
   pageFaqContent?: string;
   pagePrivacyContent?: string;
+  siteLogo?: string;
 }
 
 export function SiteContentManager() {
@@ -94,7 +99,8 @@ export function SiteContentManager() {
     aboutValue4Desc: 'Learning directly from qualified scholars and industry professionals.',
     pageEnrollContent: '',
     pageFaqContent: '',
-    pagePrivacyContent: ''
+    pagePrivacyContent: '',
+    siteLogo: '',
   });
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -456,6 +462,12 @@ export function SiteContentManager() {
                 <input type="text" value={settings.themeFooterText} onChange={e => setSettings({...settings, themeFooterText: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
               </div>
             </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Site Logo URL</label>
+              <div className="flex bg-gray-50 rounded-xl border border-gray-100 p-2 items-center gap-2">
+                <input type="text" placeholder="Drive link, Imgur, etc..." value={settings.siteLogo || ''} onChange={e => setSettings({...settings, siteLogo: e.target.value})} className="w-full bg-transparent focus:outline-none font-mono text-xs" />
+              </div>
+            </div>
           </div>
         </div>
         
@@ -487,7 +499,7 @@ export function SiteContentManager() {
             <div key={i.id} className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm group">
                <div className="aspect-[3/4] relative overflow-hidden bg-gray-100">
                   {i.image ? (
-                    <img src={i.image} className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={getDownloadUrl(i.image)} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300 italic text-xs">No image</div>
                   )}
@@ -552,6 +564,26 @@ export function SiteContentManager() {
                     placeholder="Short bio..."
                     className="h-[250px] mb-14"
                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Facebook Profile URL (Optional)</label>
+                    <input type="url" value={currentInstructor?.facebookUrl || ''} 
+                      onChange={e => setCurrentInstructor({...currentInstructor, facebookUrl: e.target.value})}
+                      className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none" placeholder="https://facebook.com/..." />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Twitter/X Profile URL (Optional)</label>
+                    <input type="url" value={currentInstructor?.twitterUrl || ''} 
+                      onChange={e => setCurrentInstructor({...currentInstructor, twitterUrl: e.target.value})}
+                      className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none" placeholder="https://twitter.com/..." />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Website URL (Optional)</label>
+                    <input type="url" value={currentInstructor?.websiteUrl || ''} 
+                      onChange={e => setCurrentInstructor({...currentInstructor, websiteUrl: e.target.value})}
+                      className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none" placeholder="https://..." />
+                  </div>
                 </div>
                 <Button type="submit" fullWidth>Save Profile</Button>
              </form>
