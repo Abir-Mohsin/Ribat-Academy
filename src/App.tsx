@@ -58,7 +58,7 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white overflow-hidden pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-white pb-16 md:pb-0 relative">
       <Navbar />
       <main className="flex-grow relative w-full overflow-x-hidden">
         <Routes>

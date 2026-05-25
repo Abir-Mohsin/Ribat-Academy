@@ -44,7 +44,8 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-[#002D34]/95 backdrop-blur-xl border-b border-white/5 font-sans">
+      <div className="h-20 shrink-0"></div>
+      <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-[#002D34]/95 backdrop-blur-xl border-b border-white/5 font-sans">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
           
           {/* Left spacer for mobile to keep logo centered */}
