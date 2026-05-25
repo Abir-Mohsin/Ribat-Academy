@@ -99,9 +99,9 @@ export function BookDetails() {
           <span className="font-bold text-xs uppercase tracking-widest">Back to Bookstore</span>
         </Link>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-          {/* Left: Images */}
-          <div className="space-y-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+          {/* Left/Col 1: Images */}
+          <div className="order-1 w-full space-y-6">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -161,11 +161,11 @@ export function BookDetails() {
             )}
           </div>
 
-          {/* Right: Info */}
+          {/* Info Block */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-8"
+            className="order-3 lg:order-2 w-full space-y-8"
           >
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
@@ -189,101 +189,103 @@ export function BookDetails() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
               {book.hasPdf && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
-                  <div className="flex flex-col items-center sm:items-start w-full">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#0EA5E9] mb-1">PDF Version</span>
-                    <div className="text-2xl font-black text-black">৳{book.pdfPrice}</div>
-                    <span className="text-[10px] font-medium text-gray-500">Read instantly on your dashboard</span>
+                <div className="flex flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all justify-between group">
+                  <div className="flex flex-col items-start">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#0EA5E9] mb-0.5">eBook / PDF</span>
+                    <div className="text-lg font-black text-black leading-none">৳{book.pdfPrice}</div>
                   </div>
-                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase('pdf', book.pdfPrice)}>
-                    <ShoppingCart size={20} />
-                    Buy PDF
+                  <Button size="sm" className="h-9 px-4 text-[10px] font-bold rounded-xl gap-1.5 bg-black hover:bg-gray-800 transition-transform group-hover:scale-[1.02]" onClick={() => handlePurchase('pdf', book.pdfPrice)}>
+                    <ShoppingCart size={14} /> Buy PDF
                   </Button>
                 </div>
               )}
               
               {book.hasHardcover && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
-                  <div className="flex flex-col items-center sm:items-start w-full">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Hardcover</span>
-                    <div className="text-2xl font-black text-black">৳{book.hardcoverPrice}</div>
-                    <span className="text-[10px] font-medium text-gray-500">Physical book delivered to your address</span>
+                <div className="flex flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all justify-between group">
+                  <div className="flex flex-col items-start">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 mb-0.5">Physical Book</span>
+                    <div className="text-lg font-black text-black leading-none">৳{book.hardcoverPrice}</div>
                   </div>
-                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase('hardcover', book.hardcoverPrice)}>
-                    <ShoppingCart size={20} />
-                    Buy Hardcover
+                  <Button size="sm" className="h-9 px-4 text-[10px] font-bold rounded-xl gap-1.5 bg-black hover:bg-gray-800 transition-transform group-hover:scale-[1.02]" onClick={() => handlePurchase('hardcover', book.hardcoverPrice)}>
+                    <ShoppingCart size={14} /> Buy Print
                   </Button>
                 </div>
               )}
 
               {!book.hasPdf && !book.hasHardcover && book.price !== undefined && (
-                 <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 justify-between">
-                  <div className="flex flex-col items-center sm:items-start w-full">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Standard Version</span>
-                    <div className="text-2xl font-black text-black">৳{book.price}</div>
+                 <div className="flex flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all justify-between group">
+                  <div className="flex flex-col items-start">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 mb-0.5">Standard Edition</span>
+                    <div className="text-lg font-black text-black leading-none">৳{book.price}</div>
                   </div>
-                  <Button size="lg" className="w-full sm:w-1/2 gap-2 shrink-0 bg-black hover:bg-gray-800" onClick={() => handlePurchase(book.bookType || 'pdf', book.price)}>
-                    <ShoppingCart size={20} />
-                    Buy Now
+                  <Button size="sm" className="h-9 px-4 text-[10px] font-bold rounded-xl gap-1.5 bg-black hover:bg-gray-800 transition-transform group-hover:scale-[1.02]" onClick={() => handlePurchase(book.bookType || 'pdf', book.price)}>
+                    <ShoppingCart size={14} /> Buy Now
                   </Button>
                 </div>
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <Button size="lg" variant="outline" className="w-full gap-2 text-gray-400 font-bold tracking-widest uppercase text-xs" onClick={() => {
+            <div className="flex gap-4 mt-6">
+              <Button size="sm" variant="outline" className="h-9 px-4 gap-2 rounded-xl text-gray-500 font-bold tracking-widest uppercase text-[10px]" onClick={() => {
                 if (navigator.share) navigator.share({ title: book.title, url: window.location.href });
               }}>
-                <Share2 size={16} /> Share
+                <Share2 size={14} /> Share
               </Button>
             </div>
 
             {/* Description Section */}
             <div className="pt-8 border-t border-gray-100">
-              <h3 className="text-xs font-black uppercase tracking-[3px] text-gray-400 mb-6 flex items-center gap-2">
-                <BookIcon size={14} /> Description
+              <h3 className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-4 flex items-center gap-2">
+                <BookIcon size={12} /> Overview
               </h3>
               <div 
                 className="rich-text-content text-gray-600 leading-relaxed text-sm lg:text-base break-words"
                 dangerouslySetInnerHTML={{ __html: book.description }}
               />
             </div>
+          </motion.div>
 
+          {/* Video Trailer placed here for grid ordering */}
+          <div className="order-2 lg:order-3 w-full">
+            {book.videoUrl && (
+              <div className="w-full">
+                <h3 className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-4 flex items-center gap-2">
+                  <BookIcon size={12} /> Trailer
+                </h3>
+                <div className="w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
+                  <iframe 
+                    src={getEmbedUrl(book.videoUrl)}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="order-4 lg:order-4 w-full">
             {/* Author Section */}
             {book.authorBio && (
-              <div className="pt-8 border-t border-gray-100">
-                <h3 className="text-xs font-black uppercase tracking-[3px] text-gray-400 mb-6 flex items-center gap-2">
-                  <User size={14} /> লেখক পরিচিতি (Author)
+              <div className="h-full">
+                <h3 className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-4 flex items-center gap-2">
+                  <User size={12} /> লেখক পরিচিতি (Author)
                 </h3>
                 <div 
-                  className="rich-text-content text-gray-600 leading-relaxed text-sm lg:text-base bg-gray-50 p-6 rounded-2xl border border-gray-100"
+                  className="rich-text-content text-gray-600 leading-relaxed text-sm lg:text-base bg-[#FAFAFA] p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm"
                   dangerouslySetInnerHTML={{ __html: book.authorBio }}
                 />
               </div>
             )}
-          </motion.div>
-        </div>
-
-        {/* Video Trailer */}
-        {book.videoUrl && (
-          <div className="mt-20 pt-16 border-t border-gray-100">
-            <h3 className="text-xl font-bold mb-8">Book Trailer</h3>
-            <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
-              <iframe 
-                src={getEmbedUrl(book.videoUrl)}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
           </div>
-        )}
+        </div>
 
         {/* Gallery Preview Below (As requested "বইয়ের নিচে কিছু ছবি যুক্ত করা থাকবে") */}
         {gallery.length > 0 && (
-          <div className="mt-24 pt-20 border-t border-gray-100">
+          <div className="mt-16 lg:mt-24 pt-16 lg:pt-20 border-t border-gray-100">
+
             <header className="mb-12">
                <h3 className="text-xs font-black uppercase tracking-[4px] text-gray-400 mb-2">GALLERY</h3>
                <h2 className="text-2xl font-black tracking-tight">বইয়ের ভেতরের কিছু পৃষ্ঠা (Preview)</h2>
