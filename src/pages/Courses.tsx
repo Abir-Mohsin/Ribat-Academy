@@ -112,7 +112,7 @@ export function Courses() {
         </header>
 
         {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
             {[1, 2, 4, 5, 6, 7, 8].map(i => (
               <div key={i} className="aspect-[3/4.2] bg-gray-50 rounded-[40px] animate-pulse relative overflow-hidden">
                  <div className="absolute inset-0 bg-gradient-to-t from-gray-100 to-transparent opacity-50" />
@@ -120,7 +120,7 @@ export function Courses() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
             {filteredItems.map(item => (
               <Card 
                 key={item.id} 

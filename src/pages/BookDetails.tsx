@@ -99,9 +99,9 @@ export function BookDetails() {
           <span className="font-bold text-xs uppercase tracking-widest">Back to Bookstore</span>
         </Link>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-20 items-start w-full">
           {/* Left/Col 1: Images */}
-          <div className="w-full space-y-6">
+          <div className="w-full space-y-6 order-1 lg:order-1">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ export function BookDetails() {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="w-full space-y-8"
+            className="w-full space-y-8 order-3 lg:order-2"
           >
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
@@ -248,7 +248,7 @@ export function BookDetails() {
           </motion.div>
 
           {/* Video Trailer placed here for grid ordering */}
-          <div className="w-full">
+          <div className="w-full order-2 lg:order-3">
             {book.videoUrl && (
               <div className="w-full">
                 <h3 className="text-[10px] font-black uppercase tracking-[3px] text-gray-400 mb-4 flex items-center gap-2">
@@ -266,7 +266,7 @@ export function BookDetails() {
             )}
           </div>
 
-          <div className="w-full">
+          <div className="w-full order-4 lg:order-4">
             {/* Author Section */}
             {book.authorBio && (
               <div className="h-full">

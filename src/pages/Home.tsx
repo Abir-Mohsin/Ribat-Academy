@@ -314,7 +314,7 @@ export function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {loading ? (
                <div className="col-span-full py-20 text-center text-gray-400">
                   <Loader2 className="animate-spin mx-auto mb-4" size={32} />
@@ -353,7 +353,7 @@ export function Home() {
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">Access our handcrafted collection of Islamic literature and academic guides, beautifully formatted for digital reading.</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-12">
             {loading ? (
               <div className="col-span-full py-20 text-center text-gray-400">
                 <Loader2 className="animate-spin mx-auto mb-4" size={32} />

@@ -54,7 +54,7 @@ export function Books() {
           <p className="text-gray-400 max-w-xl mx-auto font-medium text-sm sm:text-lg">Expand your knowledge with our exclusive collection of e-books and study guides.</p>
         </header>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
           {loading ? (
              [1,2,3,4].map(i => <div key={i} className="aspect-[3/5] bg-gray-100 rounded-[32px] animate-pulse" />)
           ) : (
