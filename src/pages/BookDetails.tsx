@@ -281,32 +281,6 @@ export function BookDetails() {
             )}
           </div>
         </div>
-
-        {/* Gallery Preview Below (As requested "বইয়ের নিচে কিছু ছবি যুক্ত করা থাকবে") */}
-        {gallery.length > 0 && (
-          <div className="mt-16 lg:mt-24 pt-16 lg:pt-20 border-t border-gray-100">
-
-            <header className="mb-12">
-               <h3 className="text-xs font-black uppercase tracking-[4px] text-gray-400 mb-2">GALLERY</h3>
-               <h2 className="text-2xl font-black tracking-tight">বইয়ের ভেতরের কিছু পৃষ্ঠা (Preview)</h2>
-            </header>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {gallery.map((img: string, i: number) => (
-                <motion.div 
-                  key={i}
-                  whileHover={{ y: -5 }}
-                  className="aspect-[3/4] bg-gray-100 rounded-3xl overflow-hidden shadow-xl border border-gray-100"
-                >
-                  <img referrerPolicy="no-referrer" 
-                    src={getThumbnailUrl(img)} 
-                    alt={`Preview ${i + 1}`} 
-                    className="w-full h-full object-cover"
-                    />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {selectedBookForPurchase && (
